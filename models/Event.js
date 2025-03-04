@@ -14,5 +14,8 @@ const eventSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
+<<<<<<< HEAD:models/Event.js
 let x = 5
+=======
+>>>>>>> rana:Models/Event.js
 module.exports = mongoose.model('Event', eventSchema);

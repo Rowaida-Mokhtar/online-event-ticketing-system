@@ -13,5 +13,5 @@ const eventSchema = new mongoose.Schema({
   organizer: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   createdAt: { type: Date, default: Date.now }
 });
-let x = 5
+
 module.exports = mongoose.model('Event', eventSchema);

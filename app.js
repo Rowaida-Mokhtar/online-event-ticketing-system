@@ -7,14 +7,13 @@ require("dotenv").config();
 const app = express();
 
 // Import Routes
-const authRouter = require("./routes/authRoutes");
-const userRouter = require("./routes/userRoutes");
-const eventRouter = require("./routes/eventRoutes");
-const bookingRouter = require("./routes/bookingRoutes");
-
+const authRouter = require("./Routes/authRoutes");
+const userRouter = require("./Routes/userRoutes");
+const eventRouter = require("./Routes/eventRoutes");
+const bookingRouter = require(".Routes/bookingRoutes");
 // Middleware
-const authenticationMiddleware = require("./middleware/authMiddleware");
-const { notFound, errorHandler } = require("./middleware/errorMiddleware");
+const authenticationMiddleware = require("./Middleware/authMiddleware");
+const { notFound, errorHandler } = require("./Middleware/errorMiddleware");
 
 // Express Middleware
 app.use(express.json());

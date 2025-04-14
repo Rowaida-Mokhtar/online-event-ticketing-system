@@ -1,7 +1,7 @@
 //task 2
 const express = require('express');
-const { createEvent, getEvents, getEventById, updateEvent, deleteEvent } = require('../controllers/eventController');
-const { authenticate, authorize } = require('../middleware/authMiddleware');
+const { createEvent, getEvents, getEventById, updateEvent, deleteEvent } = require('../Controllers/eventController');
+const { authenticate, authorize } = require('../Middleware/authMiddleware');
 
 const router = express.Router();
 

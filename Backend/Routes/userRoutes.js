@@ -11,7 +11,7 @@ const {
   getOrganizerEvents,
   getEventsAnalytics
 } = require('../Controllers/userController');
-const { authenticate, authorize } = require('../middleware/authMiddleware');
+const { authenticate, authorize } = require('../Middleware/authMiddleware');
 
 router.get('/', authenticate, authorize('admin'), getAllUsers);
 router.get('/profile', authenticate, getProfile);

@@ -1,7 +1,7 @@
 //task 2
 const express = require('express');
-const { bookTickets, getBookings, getBookingById, cancelBooking } = require('../controllers/bookingController');
-const { authenticate } = require('../middleware/authMiddleware');
+const { bookTickets, getBookings, getBookingById, cancelBooking } = require('../Controllers/bookingController');
+const { authenticate } = require('../Middleware/authMiddleware');
 
 const router = express.Router();
 

@@ -30,10 +30,11 @@ app.use(
 );
 
 // Routes
-app.use("/api/v1", authRouter); // for /register, /login, /forgetPassword
-app.use("/api/v1/users", userRouter);
-app.use("/api/v1/events", eventRouter);
-app.use("/api/v1/bookings", bookingRouter);
+app.use('/api/v1', authRoutes);                // Handles: /register, /login, /forgetPassword
+app.use('/api/v1/users', userRoutes);          // Handles: /users, /users/:id, /users/profile, etc.
+app.use('/api/v1/bookings', bookingRoutes);    // Handles: /bookings, /bookings/:id
+app.use('/api/v1/events', eventRoutes);        // Handles: /events, /events/:id
+
 
 // Not Found Handler
 app.use(notFound);
@@ -49,6 +50,8 @@ mongoose
   .connect(db_url)
   .then(() => console.log(" MongoDB connected"))
   .catch((err) => console.error(" MongoDB connection error:", err));
+
+
 
 // Start Server
 const PORT = process.env.PORT || 3000;

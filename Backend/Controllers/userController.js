@@ -6,9 +6,10 @@ exports.getAllUsers = async (req, res) => {
     const users = await User.find().select('-password');
     res.status(200).json(users);
   } catch (err) {
-    res.status(500).json({ message: 'Server Error', error: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
+
 
 // @desc    Get current user's profile
 exports.getProfile = async (req, res) => {
@@ -16,7 +17,7 @@ exports.getProfile = async (req, res) => {
     const user = await User.findById(req.user.id).select('-password');
     res.status(200).json(user);
   } catch (err) {
-    res.status(500).json({ message: 'Server Error', error: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
 
@@ -34,7 +35,7 @@ exports.updateProfile = async (req, res) => {
     const updatedUser = await user.save();
     res.status(200).json(updatedUser);
   } catch (err) {
-    res.status(500).json({ message: 'Server Error', error: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
 
@@ -46,7 +47,7 @@ exports.getUserById = async (req, res) => {
 
     res.status(200).json(user);
   } catch (err) {
-    res.status(500).json({ message: 'Server Error', error: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
 
@@ -62,7 +63,7 @@ exports.updateUserRole = async (req, res) => {
     const updatedUser = await user.save();
     res.status(200).json(updatedUser);
   } catch (err) {
-    res.status(500).json({ message: 'Server Error', error: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
 
@@ -74,7 +75,7 @@ exports.deleteUser = async (req, res) => {
 
     res.status(200).json({ message: 'User deleted successfully' });
   } catch (err) {
-    res.status(500).json({ message: 'Server Error', error: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
 

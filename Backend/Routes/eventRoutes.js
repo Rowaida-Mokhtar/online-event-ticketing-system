@@ -5,8 +5,8 @@ const authMiddleware = require('../Middleware/authMiddleware');
 
 const router = express.Router();
 
-router.post('/events', authMiddleware.authenticate, authMiddleware.authorize(['Organizer']), createEvent);
-router.get('/events', getEvents);
+router.post('/', authMiddleware.authenticate, authMiddleware.authorize(['Organizer']), createEvent);
+router.get('/', getEvents);
 router.get('/events/:id', getEventById);
 router.put('/events/:id', authMiddleware.authenticate, authMiddleware.authorize(['Organizer', 'Admin']), updateEvent);
 router.delete('/events/:id', authMiddleware.authenticate, authMiddleware.authorize(['Organizer', 'Admin']), deleteEvent);

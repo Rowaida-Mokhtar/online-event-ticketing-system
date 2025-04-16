@@ -32,8 +32,8 @@ app.use(
 // Routes
 app.use('/api/v1', authRouter);                // Handles: /register, /login, /forgetPassword
 app.use('/api/v1/users', userRouter);          // Handles: /users, /users/:id, /users/profile, etc.
-app.use('/api/v1/bookings', eventRouter);    // Handles: /bookings, /bookings/:id
-app.use('/api/v1/events', bookingRouter);        // Handles: /events, /events/:id
+app.use('/api/v1/bookings', bookingRouter);    // Handles: /bookings, /bookings/:id
+app.use('/api/v1/events', eventRouter);        // Handles: /events, /events/:id
 
 
 // Not Found Handler

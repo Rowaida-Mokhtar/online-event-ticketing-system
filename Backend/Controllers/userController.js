@@ -77,3 +77,18 @@ exports.deleteUser = async (req, res) => {
     res.status(500).json({ message: 'Server Error', error: err.message });
   }
 };
+
+// @desc    Get user bookings (user only)
+exports.getUserBookings = async (req, res) => {
+  res.status(200).json({ message: 'User bookings - to be implemented' });
+};
+
+// @desc    Get organizer events (organizer only)
+exports.getOrganizerEvents = async (req, res) => {
+  res.status(200).json({ message: 'Organizer events - to be implemented' });
+};
+
+// @desc    Get analytics for organizer events
+exports.getEventsAnalytics = async (req, res) => {
+  res.status(200).json({ message: 'Events analytics - to be implemented' });
+};

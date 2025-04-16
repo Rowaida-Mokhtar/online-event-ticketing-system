@@ -14,11 +14,14 @@ const authenticate = async (req, res, next) => {
   }
 };
 
-const authorize = (role) => {
+const authorize = (roles) => {
   return (req, res, next) => {
-    if (req.user?.role !== role) {
+    const allowedRoles = Array.isArray(roles) ? roles : [roles];
+
+    if (!allowedRoles.includes(req.user?.role)) {
       return res.status(403).json({ message: 'Access denied: insufficient permissions' });
     }
+
     next();
   };
 };

@@ -1,6 +1,32 @@
 {
   "dependencies": {
+    "bcrypt": "^5.1.1",
+    "bcryptjs": "^3.0.2",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
     "dotenv": "^16.5.0",
-    "mongoose": "^8.11.0"
-  }
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.13.2",
+    "nodemailer": "^6.10.1",
+    "nodemon": "^3.1.9"
+  },
+  "name": "online-event-ticketing-system",
+  "version": "1.0.0",
+  "description": "This is a full-stack web application for booking event tickets. It allows users to browse, search, and purchase tickets for various events.",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Rowaida-Mokhtar/online-event-ticketing-system.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Rowaida-Mokhtar/online-event-ticketing-system/issues"
+  },
+  "homepage": "https://github.com/Rowaida-Mokhtar/online-event-ticketing-system#readme"
 }

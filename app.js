@@ -1,14 +1,15 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
-const cors = require("cors");
+//
+// const cors = require("cors");
 require("dotenv").config();
 
 const app = express();
 
 // Import Routes
-const authRouter = require("./Routes/authRoutes");
-const userRouter = require("./Routes/userRoutes");
+const authRouter = require("./Backend/Routes/authRoutes");
+const userRouter = require("./Backend/Routes/userRoutes");
 const eventRouter = require("./Routes/eventRoutes");
 const bookingRouter = require(".Routes/bookingRoutes");
 // Middleware

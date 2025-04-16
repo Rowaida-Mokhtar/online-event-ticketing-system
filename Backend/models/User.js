@@ -6,6 +6,8 @@ const userSchema = new mongoose.Schema({
   profilePicture: { type: String },
   password: { type: String, required: true },
   role: { type: String, enum: ['user', 'organizer', 'admin'], default: 'user' },
+  resetOtp: { type: Number, default: null }, // OTP for password reset
+  resetOtpExpires: { type: Date, default: null }, // OTP expiry time
 },{timestamps:true});
 
 module.exports = mongoose.model('User', userSchema);

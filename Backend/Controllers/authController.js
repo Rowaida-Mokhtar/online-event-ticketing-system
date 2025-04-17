@@ -8,9 +8,9 @@ const secretKey = process.env.SECRET_KEY;
 let otpStore = {}; // In-memory OTP store (use Redis or DB in production)
 
 // Generate JWT
-const generateToken = (id, role) => {
-  return jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-};
+// const generateToken = (id, role) => {
+  // return jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+// };
 
 const userController = {
   register: async (req, res) => {

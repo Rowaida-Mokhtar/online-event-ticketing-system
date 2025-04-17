@@ -1,7 +1,7 @@
 const User = require('../models/User');
 
 // @desc    Get all users (admin only)
-exports.getAllUsers = async (req, res) => {
+const getAllUsers = async (req, res) => {
   try {
     const users = await User.find().select('-password');
     res.status(200).json(users);
@@ -10,9 +10,8 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
-
 // @desc    Get current user's profile
-exports.getProfile = async (req, res) => {
+const getProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('-password');
     res.status(200).json(user);
@@ -22,7 +21,7 @@ exports.getProfile = async (req, res) => {
 };
 
 // @desc    Update current user's profile
-exports.updateProfile = async (req, res) => {
+const updateProfile = async (req, res) => {
   const { name, email } = req.body;
 
   try {
@@ -40,7 +39,7 @@ exports.updateProfile = async (req, res) => {
 };
 
 // @desc    Get single user by ID (admin only)
-exports.getUserById = async (req, res) => {
+const getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select('-password');
     if (!user) return res.status(404).json({ message: 'User not found' });
@@ -50,9 +49,8 @@ exports.getUserById = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-
 // @desc    Update user role (admin only)
-exports.updateUserRole = async (req, res) => {
+const updateUserRole = async (req, res) => {
   const { role } = req.body;
 
   try {
@@ -68,7 +66,7 @@ exports.updateUserRole = async (req, res) => {
 };
 
 // @desc    Delete a user (admin only)
-exports.deleteUser = async (req, res) => {
+const deleteUser = async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id);
     if (!user) return res.status(404).json({ message: 'User not found' });
@@ -80,16 +78,28 @@ exports.deleteUser = async (req, res) => {
 };
 
 // @desc    Get user bookings (user only)
-exports.getUserBookings = async (req, res) => {
+const getUserBookings = async (req, res) => {
   res.status(200).json({ message: 'User bookings - to be implemented' });
 };
 
 // @desc    Get organizer events (organizer only)
-exports.getOrganizerEvents = async (req, res) => {
+const getOrganizerEvents = async (req, res) => {
   res.status(200).json({ message: 'Organizer events - to be implemented' });
 };
 
 // @desc    Get analytics for organizer events
-exports.getEventsAnalytics = async (req, res) => {
+const getEventsAnalytics = async (req, res) => {
   res.status(200).json({ message: 'Events analytics - to be implemented' });
+};
+
+module.exports = {
+  getAllUsers,
+  getProfile,
+  updateProfile,
+  getUserById,
+  updateUserRole,
+  deleteUser,
+  getUserBookings,
+  getOrganizerEvents,
+  getEventsAnalytics,
 };

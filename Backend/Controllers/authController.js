@@ -108,7 +108,7 @@ const userController = {
 
       res.status(200).json({ message: 'OTP sent to email' });
     } catch (err) {
-      res.status(500).json({ message: 'Server Error', error: err.message });
+      res.status(500).json({ message: err.message });
     }
   },
 
@@ -122,7 +122,7 @@ const userController = {
 
       res.status(200).json({ message: 'OTP verified' });
     } catch (err) {
-      res.status(500).json({ message: 'Server Error', error: err.message });
+      res.status(500).json({ message: err.message });
     }
   },
 
@@ -145,7 +145,7 @@ const userController = {
 
       res.status(200).json({ message: 'Password reset successfully' });
     } catch (err) {
-      res.status(500).json({ message: 'Server Error', error: err.message });
+      res.status(500).json({ message: err.message });
     }
   }
 };

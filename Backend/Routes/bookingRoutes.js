@@ -5,10 +5,10 @@ const authMiddleware = require('../Middleware/authMiddleware');
 
 const router = express.Router();
 
-router.post('/bookings', authMiddleware.authenticate, bookingController.bookTickets);
-router.get('/bookings', authMiddleware.authenticate, bookingController.getBookings);
-router.get('/bookings/:id', authMiddleware.authenticate, bookingController.getBookingById);
-router.delete('/bookings/:id', authMiddleware.authenticate, bookingController.cancelBooking);
+router.post('/', authMiddleware.authenticate, bookingController.bookTickets);
+router.get('/users', authMiddleware.authenticate, bookingController.getBookings);
+router.get('/:id', authMiddleware.authenticate, bookingController.getBookingById);
+router.delete('/:id', authMiddleware.authenticate, bookingController.cancelBooking);
 
 
 module.exports = router;

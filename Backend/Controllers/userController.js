@@ -1,4 +1,6 @@
 const User = require('../models/User');
+const Booking = require('../models/Booking');
+const Event = require('../models/Event');
 const bcrypt = require('bcrypt');
 
 // @desc    Get all users (admin only)
@@ -90,17 +92,69 @@ const deleteUser = async (req, res) => {
 
 // @desc    Get user bookings (user only)
 const getUserBookings = async (req, res) => {
-  res.status(200).json({ message: 'User bookings - to be implemented' });
+  try {
+    const bookings = await Booking.find({ user: req.user._id }).populate('event');
+    
+    if (bookings.length === 0) {
+      return res.status(200).json({ message: 'No bookings found for this user.', bookings: [] });
+    }
+
+    res.status(200).json(bookings);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching user bookings", error: error.message });
+  }
 };
 
 // @desc    Get organizer events (organizer only)
 const getOrganizerEvents = async (req, res) => {
-  res.status(200).json({ message: 'Organizer events - to be implemented' });
+  try {
+    const events = await Event.find({ organizer: req.user._id });
+
+    if (events.length === 0) {
+      return res.status(200).json({ message: 'No events found for this organizer.', events: [] });
+    }
+
+    res.status(200).json(events);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching organizer events", error: error.message });
+  }
 };
+
 
 // @desc    Get analytics for organizer events
 const getEventsAnalytics = async (req, res) => {
-  res.status(200).json({ message: 'Events analytics - to be implemented' });
+  try {
+    const events = await Event.find({ organizer: req.user._id });
+
+    if (events.length === 0) {
+      return res.status(200).json({
+        message: 'No events created by this organizer yet.',
+        totalEvents: 0,
+        totalTicketsSold: 0,
+        totalRevenue: 0
+      });
+    }
+
+    let totalTicketsSold = 0;
+    let totalRevenue = 0;
+
+    for (const event of events) {
+      const bookings = await Booking.find({ event: event._id });
+
+      bookings.forEach(booking => {
+        totalTicketsSold += booking.numberOfTickets;
+        totalRevenue += booking.totalPrice;
+      });
+    }
+
+    res.status(200).json({
+      totalEvents: events.length,
+      totalTicketsSold,
+      totalRevenue
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching analytics", error: error.message });
+  }
 };
 
 module.exports = {

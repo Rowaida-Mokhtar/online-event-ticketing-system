@@ -17,6 +17,10 @@ const userController = {
     try {
       const { email, password, name, role, age } = req.body;
 
+      if (!email ||! password || !name|| !age) {
+        return res.status(400).json({ message: "Missing fields" });
+      }
+
       const existingUser = await User.findOne({ email });
       if (existingUser) {
         return res.status(409).json({ message: "User already exists" });
@@ -45,6 +49,9 @@ const userController = {
     try {
       const { email, password } = req.body;
 
+  if (!email || !password) {
+  return res.status(400).json({ message: "Email and password are required" });
+ }
       const user = await User.findOne({ email });
       if (!user) {
         return res.status(404).json({ message: "Email not found" });

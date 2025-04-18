@@ -5,7 +5,7 @@ const secretKey = process.env.SECRET_KEY
 // Authentication Middleware
 module.exports.authenticate = async function (req, res, next) {
   try {
-    console.log("Inside auth middleware");
+    //console.log("Inside auth middleware");
 
     const cookies = req.cookies;
     if (!cookies || !cookies.token) {
@@ -15,7 +15,7 @@ module.exports.authenticate = async function (req, res, next) {
     // Verify token
     const decoded = jwt.verify(token, secretKey);
     // Get user from DB
-    const user = await User.findById(decoded.id).select("-password");
+    const user = await User.findById(decoded.user.userId).select("-password");
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }

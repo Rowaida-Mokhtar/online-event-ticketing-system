@@ -3,7 +3,7 @@ const router = express.Router();
 const userController = require('../Controllers/userController');
 const { authenticate, authorize } = require('../Middleware/authMiddleware');
 
-router.get('/', authenticate, authorize('admin'), userController.getAllUsers);
+router.get('', authenticate, authorize('admin'), userController.getAllUsers);
 router.get('/profile', authenticate, userController.getProfile);
 router.put('/profile', authenticate, userController.updateProfile);
 router.get('/bookings', authenticate, authorize('user'), userController.getUserBookings);

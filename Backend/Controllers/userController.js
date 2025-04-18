@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const bcrypt = require('bcrypt');
 
 // @desc    Get all users (admin only)
 const getAllUsers = async (req, res) => {
@@ -22,15 +23,25 @@ const getProfile = async (req, res) => {
 
 // @desc    Update current user's profile
 const updateProfile = async (req, res) => {
-  const { name, email } = req.body;
+  const { name, email, age, profilePicture,password } = req.body;
 
   try {
+    // Find the user in the database by their ID (from authenticated user)
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    user.name = name || user.name;
-    user.email = email || user.email;
+    // Only update fields if provided in the request body
+    if (name) user.name = name;
+    if (email) user.email = email;
+    if (age) user.age = age; // Allow updating the 'age' field
+    if (profilePicture) user.profilePicture = profilePicture;
 
+    if (password) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      user.password = hashedPassword;
+    }
+
+    // Save the updated user
     const updatedUser = await user.save();
     res.status(200).json(updatedUser);
   } catch (err) {

@@ -59,7 +59,7 @@ const userController = {
 
       const passwordMatch = await bcrypt.compare(password, user.password);
       if (!passwordMatch) {
-        return res.status(405).json({ message: "Incorrect password" });
+        return res.status(401).json({ message: "Incorrect password" });
       }
 
       const currentDateTime = new Date();

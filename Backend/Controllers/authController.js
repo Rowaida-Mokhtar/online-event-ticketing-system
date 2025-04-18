@@ -89,72 +89,79 @@ const userController = {
   },
 
   forgetPassword: async (req, res) => {
-    const { email } = req.body;
+    const { email, otp, newPassword, step } = req.body;
 
     try {
-      const user = await User.findOne({ email });
-      if (!user) return res.status(404).json({ message: 'User not found' });
+      if (!step) return res.status(400).json({ message: "Step is required" });
 
-      const otp = Math.floor(100000 + Math.random() * 900000).toString();
-      otpStore[email] = otp;
+      // STEP 1: Request OTP
+      if (step === "request") {
+        const user = await User.findOne({ email });
+        if (!user) return res.status(404).json({ message: "User not found" });
 
-      const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS,
-        },
-      });
+        const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
+        otpStore[email] = {
+          otp: generatedOtp,
+          expiresAt: Date.now() + 5 * 60 * 1000, // 5 minutes
+        };
 
-      await transporter.sendMail({
-        from: process.env.EMAIL_USER,
-        to: email,
-        subject: 'Password Reset OTP',
-        text: `Your OTP for password reset is: ${otp}`,
-      });
+        const transporter = nodemailer.createTransport({
+          service: "gmail",
+          auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+          },
+        });
 
-      res.status(200).json({ message: 'OTP sent to email' });
-    } catch (err) {
-      res.status(500).json({ message: err.message });
-    }
-  },
+        await transporter.sendMail({
+          from: process.env.EMAIL_USER,
+          to: email,
+          subject: "Password Reset OTP",
+          text: `Your OTP for password reset is: ${generatedOtp}`,
+        });
 
-  verifyOtp: async (req, res) => {
-    const { email, otp } = req.body;
-
-    try {
-      if (otpStore[email] !== otp) {
-        return res.status(400).json({ message: 'Invalid OTP' });
+        return res.status(200).json({ message: "OTP sent to email" });
       }
 
-      res.status(200).json({ message: 'OTP verified' });
-    } catch (err) {
-      res.status(500).json({ message: err.message });
-    }
-  },
+      // STEP 2: Verify OTP
+      if (step === "verify") {
+        const record = otpStore[email];
+        if (!record || record.otp !== otp || Date.now() > record.expiresAt) {
+          return res.status(400).json({ message: "Invalid or expired OTP" });
+        }
 
-  resetPassword: async (req, res) => {
-    const { email, newPassword, otp } = req.body;
-
-    try {
-      if (otpStore[email] !== otp) {
-        return res.status(400).json({ message: 'Invalid OTP' });
+        return res.status(200).json({ message: "OTP verified" });
       }
 
-      const user = await User.findOne({ email });
-      if (!user) return res.status(404).json({ message: 'User not found' });
+      // STEP 3: Reset Password
+      if (step === "reset") {
+        if (!otp || !newPassword) {
+          return res.status(400).json({ message: "OTP and new password are required" });
+        }
 
-      const hashedPassword = await bcrypt.hash(newPassword, 10);
-      user.password = hashedPassword;
-      await user.save();
+        const record = otpStore[email];
+        if (!record || record.otp !== otp || Date.now() > record.expiresAt) {
+          return res.status(400).json({ message: "Invalid or expired OTP" });
+        }
 
-      delete otpStore[email];
+        const user = await User.findOne({ email });
+        if (!user) return res.status(404).json({ message: "User not found" });
 
-      res.status(200).json({ message: 'Password reset successfully' });
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        user.password = hashedPassword;
+        await user.save();
+
+        delete otpStore[email];
+
+        return res.status(200).json({ message: "Password reset successfully" });
+      }
+
+      return res.status(400).json({ message: "Invalid step" });
     } catch (err) {
-      res.status(500).json({ message: err.message });
+      console.error("Forget password error:", err);
+      res.status(500).json({ message: "Server error" });
     }
-  }
+  },
 };
 
 module.exports = userController;

@@ -1,54 +1,106 @@
-//task 2
 const Event = require('../models/Event');
 const User = require('../models/User');
 
+// Create new event - default status: pending
 const createEvent = async (req, res) => {
-  const { title, description, date, location, category, image, ticketPrice, totalTickets } = req.body;
-  const organizer = req.user._id;
-  const newEvent = new Event({ title, description, date, location, category, image, ticketPrice, totalTickets, organizer });
-  await newEvent.save();
-  res.status(201).json(newEvent);
+  try {
+    const { title, description, date, location, category, image, ticketPrice, totalTickets } = req.body;
+    const organizer = req.user._id;
+
+    const newEvent = new Event({
+      title,
+      description,
+      date,
+      location,
+      category,
+      image,
+      ticketPrice,
+      totalTickets,
+      remainingTickets: totalTickets, // set initially equal to total
+      organizer,
+      status: 'pending', // all new events need admin approval
+    });
+
+    await newEvent.save();
+    res.status(201).json({ message: 'Event created and pending approval', event: newEvent });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
 };
 
-const getEvents = async (req, res) => {
-  const events = await Event.find();
-  res.json(events);
+// Get only approved events (public route)
+const getApprovedEvents = async (req, res) => {
+  try {
+    const events = await Event.find({ status: 'approved' });
+    if (events.length === 0) {
+      return res.status(404).json({ message: 'No Approved events found' });
+    }
+    res.json(events);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
 };
 
+const getAllEvents = async (req, res) => {
+  try {
+    const events = await Event.find({});
+    if (events.length === 0) {
+      return res.status(404).json({ message: 'No events found' });
+    }
+    res.json(events);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
+// Get event by ID (public route)
 const getEventById = async (req, res) => {
-  const event = await Event.findById(req.params.id);
-  if (!event) {
-    return res.status(404).json({ message: 'Event not found' });
+  try {
+    const event = await Event.findById(req.params.id);
+    if (!event) return res.status(404).json({ message: 'Event not found' });
+
+    if (event.status !== 'approved') {
+      return res.status(403).json({ message: 'Event is not approved' });
+    }
+
+    res.json(event);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
   }
-  res.json(event);
 };
 
+// Update event (organizer or admin only - middleware should verify)
 const updateEvent = async (req, res) => {
-  const event = await Event.findByIdAndUpdate(req.params.id, req.body, { new: true });
-  if (!event) {
-    return res.status(404).json({ message: 'Event not found' });
+  try {
+    const event = await Event.findById(req.params.id);
+    if (!event) return res.status(404).json({ message: 'Event not found' });
+
+    Object.assign(event, req.body);
+    await event.save();
+
+    res.json({ message: 'Event updated successfully', event });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
   }
-  res.json(event);
 };
 
+// Delete event (organizer or admin only)
 const deleteEvent = async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);
+    if (!event) return res.status(404).json({ message: 'Event not found' });
 
-    if (!event) {
-      return res.status(404).json({ message: 'Event not found' });
-    }
-
-    await event.remove(); // or Event.findByIdAndDelete(req.params.id)
-
+    await event.remove();
     res.status(200).json({ message: 'Event deleted successfully' });
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
+
 module.exports = {
   createEvent,
-  getEvents,
+  getApprovedEvents,
+  getAllEvents,
   getEventById,
   updateEvent,
   deleteEvent

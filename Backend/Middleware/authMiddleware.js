@@ -1,32 +1,40 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const secretKey = process.env.SECRET_KEY
 
-const authenticate = async (req, res, next) => {
+// Authentication Middleware
+module.exports.authenticate = async function (req, res, next) {
   try {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
-    if (!token) return res.status(401).json({ message: 'No token, authorization denied' });
+    //console.log("Inside auth middleware");
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = await User.findById(decoded.id).select('-password');
+    const cookies = req.cookies;
+    if (!cookies || !cookies.token) {
+      return res.status(401).json({ message: "No token provided in cookies" });
+    }
+    const token = cookies.token;
+    // Verify token
+    const decoded = jwt.verify(token, secretKey);
+    // Get user from DB
+    const user = await User.findById(decoded.user.userId).select("-password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    req.user = user;
     next();
-  } catch (err) {
-    return res.status(401).json({ message: 'Token is not valid' });
+  } catch (error) {
+    return res.status(403).json({ message: "Invalid or expired token" });
   }
 };
 
-const authorize = (roles) => {
-  return (req, res, next) => {
-    const allowedRoles = Array.isArray(roles) ? roles : [roles];
+// Authorization Middleware
+module.exports.authorize = function (allowedRoles) {
+  return function (req, res, next) {
+    const userRole = req.user?.role;
 
-    if (!allowedRoles.includes(req.user?.role)) {
-      return res.status(403).json({ message: 'Access denied: insufficient permissions' });
+    if (!allowedRoles.includes(userRole)) {
+      return res.status(403).json({ message: "Unauthorized access" });
     }
 
     next();
   };
-};
-
-module.exports = {
-  authenticate,
-  authorize
 };

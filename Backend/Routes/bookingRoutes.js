@@ -1,13 +1,13 @@
 //task 2
 const express = require('express');
-const { bookTickets, getBookings, getBookingById, cancelBooking } = require('../Controllers/bookingController');
-const { authenticate } = require('../Middleware/authMiddleware');
+const bookingController = require('../Controllers/bookingController');
+const authMiddleware = require('../Middleware/authMiddleware');
 
 const router = express.Router();
 
-router.post('/bookings', authenticate, bookTickets);
-router.get('/bookings', authenticate, getBookings);
-router.get('/bookings/:id', authenticate, getBookingById);
-router.delete('/bookings/:id', authenticate, cancelBooking);
+router.post('', authMiddleware.authenticate, bookingController.bookTickets);
+router.get('/:id', authMiddleware.authenticate, bookingController.getBookingById);
+router.delete('/:id', authMiddleware.authenticate, bookingController.cancelBooking);
+
 
 module.exports = router;

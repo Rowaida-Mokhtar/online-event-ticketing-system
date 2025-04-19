@@ -1,14 +1,15 @@
 //task 2
 const express = require('express');
-const { createEvent, getEvents, getEventById, updateEvent, deleteEvent } = require('../Controllers/eventController');
-const { authenticate, authorize } = require('../Middleware/authMiddleware');
+const eventController = require('../Controllers/eventController');
+const authMiddleware = require('../Middleware/authMiddleware');
 
 const router = express.Router();
 
-router.post('/events', authenticate, authorize(['Organizer']), createEvent);
-router.get('/events', getEvents);
-router.get('/events/:id', getEventById);
-router.put('/events/:id', authenticate, authorize(['Organizer', 'Admin']), updateEvent);
-router.delete('/events/:id', authenticate, authorize(['Organizer', 'Admin']), deleteEvent);
+router.post('', authMiddleware.authenticate, authMiddleware.authorize(['Organizer']), eventController.createEvent);
+router.get('', eventController.getApprovedEvents);
+router.get('/all',authMiddleware.authenticate, authMiddleware.authorize(['Admin']), eventController.getAllEvents); 
+router.get('/:id', eventController.getEventById);
+router.put('/:id', authMiddleware.authenticate, authMiddleware.authorize(['Organizer', 'Admin']), eventController.updateEvent);
+router.delete('/:id', authMiddleware.authenticate, authMiddleware.authorize(['Organizer', 'Admin']), eventController.deleteEvent);
 
 module.exports = router;

@@ -25,10 +25,7 @@ const bookTickets = async (req, res) => {
   res.status(201).json(newBooking);
 };
 
-const getBookings = async (req, res) => {
-  const bookings = await Booking.find({ user: req.user._id });
-  res.json(bookings);
-};
+
 
 const getBookingById = async (req, res) => {
   const booking = await Booking.findById(req.params.id);
@@ -51,4 +48,4 @@ const cancelBooking = async (req, res) => {
   res.json({ message: 'Booking canceled successfully' });
 };
 
-module.exports = { bookTickets, getBookings, getBookingById, cancelBooking }; 
+module.exports = { bookTickets, getBookingById, cancelBooking }; 

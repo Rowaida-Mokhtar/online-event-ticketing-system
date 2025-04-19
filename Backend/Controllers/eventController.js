@@ -5,8 +5,10 @@ const User = require('../models/User');
 const createEvent = async (req, res) => {
   try {
     const { title, description, date, location, category, image, ticketPrice, totalTickets } = req.body;
+    if (!title || !description || !date || !location || !category || ticketPrice == null || totalTickets == null) {
+      return res.status(400).json({ message: 'Please provide all required fields.' });
+    }
     const organizer = req.user._id;
-
     const newEvent = new Event({
       title,
       description,
@@ -69,15 +71,30 @@ const getEventById = async (req, res) => {
   }
 };
 
-// Update event (organizer or admin only - middleware should verify)
 const updateEvent = async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);
     if (!event) return res.status(404).json({ message: 'Event not found' });
+    const isAdmin = req.user.role === 'admin';
 
-    Object.assign(event, req.body);
+    // Prevent non-admins from updating the 'status' field
+    const updates = { ...req.body };
+    if (!isAdmin && 'status' in updates) {
+      return res.status(403).json({ message: 'Only admin can update the status of an event' });
+    }
+    if ('ticketPrice' in updates && updates.ticketPrice < 0) {
+      return res.status(400).json({ message: 'Ticket price cannot be negative' });
+    }
+
+    if ('totalTickets' in updates && updates.totalTickets < 1) {
+      return res.status(400).json({ message: 'Total tickets must be at least 1' });
+    }
+
+    if ('remainingTickets' in updates && updates.remainingTickets < 0) {
+      return res.status(400).json({ message: 'Remaining tickets cannot be negative' });
+    }
+    Object.assign(event, updates);
     await event.save();
-
     res.json({ message: 'Event updated successfully', event });
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
@@ -90,7 +107,7 @@ const deleteEvent = async (req, res) => {
     const event = await Event.findById(req.params.id);
     if (!event) return res.status(404).json({ message: 'Event not found' });
 
-    await event.remove();
+    await event.deleteOne();
     res.status(200).json({ message: 'Event deleted successfully' });
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });

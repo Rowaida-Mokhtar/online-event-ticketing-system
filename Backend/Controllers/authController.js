@@ -4,6 +4,8 @@ const User = require('../models/User');
 const nodemailer = require('nodemailer');
 require("dotenv").config();
 const secretKey = process.env.SECRET_KEY;
+const otpStore = {};
+
 
 const userController = {
   register: async (req, res) => {

@@ -43,8 +43,7 @@ app.use(notFound);
 app.use(errorHandler);
 
 // MongoDB Connection
-//const db_name = process.env.DB_NAME || "event_ticketing";
-const db_url = process.env.MONGO_URI; // fallback to local or cloud
+const db_url = process.env.MONGO_URI; 
 
 mongoose
   .connect(db_url)

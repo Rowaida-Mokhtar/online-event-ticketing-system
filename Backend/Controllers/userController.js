@@ -25,13 +25,16 @@ const getProfile = async (req, res) => {
 
 // @desc    Update current user's profile
 const updateProfile = async (req, res) => {
-  const { name, email, age, profilePicture,password } = req.body;
+  const { name, email, age, profilePicture,password,role} = req.body;
 
   try {
     // Find the user in the database by their ID (from authenticated user)
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: 'User not found' });
 
+    if (role && role !== user.role) {
+      return res.status(403).json({ message: "You are not allowed to change your role" });
+    }
     // Only update fields if provided in the request body
     if (name) user.name = name;
     if (email) user.email = email;

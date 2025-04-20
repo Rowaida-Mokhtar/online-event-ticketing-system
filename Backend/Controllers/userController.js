@@ -134,26 +134,42 @@ const getEventsAnalytics = async (req, res) => {
         message: 'No events created by this organizer yet.',
         totalEvents: 0,
         totalTicketsSold: 0,
-        totalRevenue: 0
+        totalRevenue: 0,
+        eventStats: []
       });
     }
 
     let totalTicketsSold = 0;
     let totalRevenue = 0;
+    let eventStats = [];
 
     for (const event of events) {
       const bookings = await Booking.find({ event: event._id });
 
+      let eventTicketsSold = 0;
+      let eventRevenue = 0;
+
       bookings.forEach(booking => {
-        totalTicketsSold += booking.numberOfTickets;
-        totalRevenue += booking.totalPrice;
+        eventTicketsSold += booking.numberOfTickets;
+        eventRevenue += booking.totalPrice;
+      });
+
+      totalTicketsSold += eventTicketsSold;
+      totalRevenue += eventRevenue;
+
+      eventStats.push({
+        eventId: event._id,
+        eventName: event.title,
+        ticketsSold: eventTicketsSold,
+        totalTickets: event.totalTickets || 0, // if your Event model includes this
       });
     }
 
     res.status(200).json({
       totalEvents: events.length,
       totalTicketsSold,
-      totalRevenue
+      totalRevenue,
+      eventStats,
     });
   } catch (error) {
     res.status(500).json({ message: "Error fetching analytics", error: error.message });

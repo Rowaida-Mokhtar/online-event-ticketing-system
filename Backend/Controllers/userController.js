@@ -28,27 +28,24 @@ const updateProfile = async (req, res) => {
   const { name, email, age, profilePicture,password,role} = req.body;
 
   try {
-    // Find the user in the database by their ID (from authenticated user)
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: 'User not found' });
 
     if (role && role !== user.role) {
       return res.status(403).json({ message: "You are not allowed to change your role" });
     }
-    // Only update fields if provided in the request body
     if (name) user.name = name;
     if (email) user.email = email;
-    if (age) user.age = age; // Allow updating the 'age' field
+    if (age) user.age = age; 
     if (profilePicture) user.profilePicture = profilePicture;
 
     if (password) {
       const hashedPassword = await bcrypt.hash(password, 10);
       user.password = hashedPassword;
     }
-
-    // Save the updated user
+    
     const updatedUser = await user.save();
-    res.status(200).json(updatedUser);
+    res.status(200).json({ message: 'User updated successfully', user: updatedUser });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -68,7 +65,6 @@ const getUserById = async (req, res) => {
 // @desc    Update user role (admin only)
 const updateUserRole = async (req, res) => {
   const { role } = req.body;
-  User.role = role; //check this 
   try {
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ message: 'User not found' });
@@ -98,7 +94,7 @@ const getUserBookings = async (req, res) => {
     const bookings = await Booking.find({ user: req.user._id }).populate('event');
     
     if (bookings.length === 0) {
-      return res.status(200).json({ message: 'No bookings found for this user.', bookings: [] });
+      return res.status(200).json({ message: 'No bookings found for this user.' });
     }
 
     res.status(200).json(bookings);

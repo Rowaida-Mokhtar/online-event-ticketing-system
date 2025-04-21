@@ -57,16 +57,15 @@ const userController = {
         return res.status(401).json({ message: "Incorrect password" });
       }
 
-      const currentDateTime = new Date();
-      const expiresAt = new Date(+currentDateTime + 1800000); // 30 min
+    const expiresInMs = 3 * 60 * 60 * 1000; // 3 hours in milliseconds
+    const expiresAt = new Date(Date.now() + expiresInMs);
 
-      const token = jwt.sign(
-        { user: { userId: user._id, role: user.role } },
-        secretKey,
-        {
-          expiresIn: 3 * 60 * 60, // 3 hours
-        }
-      );
+    const token = jwt.sign(
+      { user: { userId: user._id, role: user.role } },
+      secretKey,
+      { expiresIn: '3h' } // JWT valid for 3 hours
+    );
+
 
       return res
         .cookie("token", token, {

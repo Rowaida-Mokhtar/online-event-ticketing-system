@@ -56,7 +56,7 @@ const getAllEvents = async (req, res) => {
   }
 };
 
-// Get event by ID (public route)
+
 const getEventById = async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);

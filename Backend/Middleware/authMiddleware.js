@@ -5,8 +5,6 @@ const secretKey = process.env.SECRET_KEY
 // Authentication Middleware
 module.exports.authenticate = async function (req, res, next) {
   try {
-    //console.log("Inside auth middleware");
-
     const cookies = req.cookies;
     if (!cookies || !cookies.token) {
       return res.status(401).json({ message: "No token provided in cookies" });
@@ -22,7 +20,7 @@ module.exports.authenticate = async function (req, res, next) {
     req.user = user;
     next();
   } catch (error) {
-    return res.status(403).json({ message: "Invalid or expired token" });
+    return res.status(403).json({ message: "Your Login has Expired,Please Login Again" });
   }
 };
 

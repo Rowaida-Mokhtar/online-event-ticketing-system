@@ -156,7 +156,7 @@ const getEventsAnalytics = async (req, res) => {
         eventId: event._id,
         eventName: event.title,
         ticketsSold: eventTicketsSold,
-        totalTickets: event.totalTickets || 0, // if your Event model includes this
+        totalTickets: event.totalTickets || 0,
       });
     }
 

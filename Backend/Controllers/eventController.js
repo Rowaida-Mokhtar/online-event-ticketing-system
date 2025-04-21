@@ -1,7 +1,6 @@
 const Event = require('../models/Event');
 const Booking = require('../models/Booking');
 const User = require('../models/User');
-const cancelBooking = require('../Controllers/bookingController');
 
 // Create new event - default status: pending
 const createEvent = async (req, res) => {
@@ -78,10 +77,15 @@ const updateEvent = async (req, res) => {
     const event = await Event.findById(req.params.id);
     if (!event) return res.status(404).json({ message: 'Event not found' });
     const isAdmin = req.user.role === 'admin';
-  
+    
     const updates = { ...req.body };
     if (!isAdmin && 'status' in updates) {
       return res.status(403).json({ message: 'Only admin can update the status of an event' });
+    }
+    if ('totalTickets' in updates && updates.totalTickets < (event.totalTickets - event.remainingTickets)) {
+      return res.status(400).json({
+        message: 'Cannot reduce total tickets below number already booked'
+      });
     }
     if ('ticketPrice' in updates && updates.ticketPrice < 0) {
       return res.status(400).json({ message: 'Ticket price cannot be negative' });
@@ -108,7 +112,10 @@ const deleteEvent = async (req, res) => {
     const event = await Event.findById(req.params.id);
     if (!event) return res.status(404).json({ message: 'Event not found' });
 
-    //implement the cancelling of bookings 
+    await Booking.updateMany(
+      { event: req.params.id, status: { $ne: 'canceled' } },
+      { $set: { status: 'canceled' } }
+    );
 
     await event.deleteOne();
     res.status(200).json({ message: 'Event deleted successfully' });

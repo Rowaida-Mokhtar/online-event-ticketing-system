@@ -1,4 +1,3 @@
-//task 2
 const express = require('express');
 const eventController = require('../Controllers/eventController');
 const authMiddleware = require('../Middleware/authMiddleware');

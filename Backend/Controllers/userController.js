@@ -3,7 +3,7 @@ const Booking = require('../models/Booking');
 const Event = require('../models/Event');
 const bcrypt = require('bcrypt');
 
-// @desc    Get all users (admin only)
+// @desc Get all users (admin only)
 const getAllUsers = async (req, res) => {
   try {
     const users = await User.find().select('-password');
@@ -13,7 +13,7 @@ const getAllUsers = async (req, res) => {
   }
 };
 
-// @desc    Get current user's profile
+// @desc Get current user's profile
 const getProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('-password');
@@ -23,7 +23,7 @@ const getProfile = async (req, res) => {
   }
 };
 
-// @desc    Update current user's profile
+// @desc Update current user's profile
 const updateProfile = async (req, res) => {
   const { name, email, age, profilePicture,password,role} = req.body;
 
@@ -51,7 +51,7 @@ const updateProfile = async (req, res) => {
   }
 };
 
-// @desc    Get single user by ID (admin only)
+// @desc Get single user by ID (admin only)
 const getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select('-password');
@@ -62,7 +62,7 @@ const getUserById = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-// @desc    Update user role (admin only)
+// @desc Update user role (admin only)
 const updateUserRole = async (req, res) => {
   const { role } = req.body;
   try {
@@ -76,7 +76,7 @@ const updateUserRole = async (req, res) => {
   }
 };
 
-// @desc    Delete a user (admin only)
+// @desc Delete a user (admin only)
 const deleteUser = async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id);
@@ -88,7 +88,7 @@ const deleteUser = async (req, res) => {
   }
 };
 
-// @desc    Get user bookings (user only)
+// @desc Get user bookings (user only)
 const getUserBookings = async (req, res) => {
   try {
     const bookings = await Booking.find({ user: req.user._id });
@@ -103,7 +103,7 @@ const getUserBookings = async (req, res) => {
   }
 };
 
-// @desc    Get organizer events (organizer only)
+// @desc Get organizer events (organizer only)
 const getOrganizerEvents = async (req, res) => {
   try {
     const events = await Event.find({ organizer: req.user._id });
@@ -119,7 +119,7 @@ const getOrganizerEvents = async (req, res) => {
 };
 
 
-// @desc    Get analytics for organizer events
+// @desc Get analytics for organizer events
 const getEventsAnalytics = async (req, res) => {
   try {
     const events = await Event.find({ organizer: req.user._id });

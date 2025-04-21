@@ -19,7 +19,7 @@ const createEvent = async (req, res) => {
       image,
       ticketPrice,
       totalTickets,
-      remainingTickets: totalTickets, // set initially equal to total
+      remainingTickets: totalTickets, 
       organizer,
       status: 'pending', // all new events need admin approval
     });

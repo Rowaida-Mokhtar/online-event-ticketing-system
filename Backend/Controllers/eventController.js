@@ -1,5 +1,7 @@
 const Event = require('../models/Event');
+const Booking = require('../models/Booking');
 const User = require('../models/User');
+const cancelBooking = require('../Controllers/bookingController');
 
 // Create new event - default status: pending
 const createEvent = async (req, res) => {
@@ -76,8 +78,7 @@ const updateEvent = async (req, res) => {
     const event = await Event.findById(req.params.id);
     if (!event) return res.status(404).json({ message: 'Event not found' });
     const isAdmin = req.user.role === 'admin';
-
-    // Prevent non-admins from updating the 'status' field
+  
     const updates = { ...req.body };
     if (!isAdmin && 'status' in updates) {
       return res.status(403).json({ message: 'Only admin can update the status of an event' });
@@ -106,6 +107,8 @@ const deleteEvent = async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);
     if (!event) return res.status(404).json({ message: 'Event not found' });
+
+    //implement the cancelling of bookings 
 
     await event.deleteOne();
     res.status(200).json({ message: 'Event deleted successfully' });

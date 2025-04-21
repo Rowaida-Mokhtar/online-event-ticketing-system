@@ -68,11 +68,10 @@ const getUserById = async (req, res) => {
 // @desc    Update user role (admin only)
 const updateUserRole = async (req, res) => {
   const { role } = req.body;
-
+  User.role = role; //check this 
   try {
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ message: 'User not found' });
-
     user.role = role;
     const updatedUser = await user.save();
     res.status(200).json(updatedUser);

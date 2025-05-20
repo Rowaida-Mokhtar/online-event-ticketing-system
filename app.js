@@ -36,6 +36,10 @@ app.use('/api/v1/users', userRouter);
 app.use('/api/v1/bookings', bookingRouter);    
 app.use('/api/v1/events', eventRouter);       
 
+app.get('/', (req, res) => {
+  res.send('API is running');
+});
+
 
 // Not Found Handler
 app.use(notFound);

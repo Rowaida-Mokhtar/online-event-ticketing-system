@@ -24,7 +24,7 @@ app.use(cookieParser());
 // CORS Config
 app.use(
   cors({
-    origin: process.env.ORIGIN || "http://localhost:3000",
+    origin: process.env.ORIGIN || "http://localhost:5000",
     methods: ["GET", "POST", "DELETE", "PUT"],
     credentials: true,
   })
@@ -56,7 +56,7 @@ mongoose
   .catch((err) => console.error(" MongoDB connection error:", err));
 
 // Start Server
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });

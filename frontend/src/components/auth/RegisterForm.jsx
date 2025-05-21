@@ -1,39 +1,91 @@
-// RegisterForm.jsx
 import React, { useState } from 'react';
-import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { register } from '../../services/axios';
 
-function RegisterForm() {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [role, setRole] = useState('user'); // can be "user", "organizer"
-  const [error, setError] = useState('');
+const Register = () => {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    name: '',
+    role: '', // optional, or default to 'User'
+    age: '',
+  });
+  const [errorMsg, setErrorMsg] = useState('');
 
-  const handleSubmit = async (e) => {
+  const handleChange = (e) => {
+    setFormData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleRegister = async (e) => {
     e.preventDefault();
+    setErrorMsg('');
+
     try {
-      await axios.post('http://localhost:3000/api/v1/register', { name, email, password, role });
-      alert('Registration successful! Redirecting to login...');
-      window.location.href = '/login';
+      const res = await register(formData);
+      if (res.status === 201) {
+        navigate('/login');
+      }
     } catch (err) {
-      setError('Registration failed. Try again.');
+      setErrorMsg(err.response?.data?.message || 'Registration failed');
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <div className="register-container">
       <h2>Register</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <input type="text" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} required />
-      <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-      <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-      <select value={role} onChange={(e) => setRole(e.target.value)}>
-        <option value="user">Standard User</option>
-        <option value="organizer">Event Organizer</option>
-      </select>
-      <button type="submit">Register</button>
-    </form>
+      {errorMsg && <p style={{ color: 'red' }}>{errorMsg}</p>}
+      <form onSubmit={handleRegister}>
+        <input
+          type="text"
+          name="name"
+          placeholder="Name"
+          value={formData.name}
+          onChange={handleChange}
+          required
+        />
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={formData.email}
+          onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value.toLowerCase() }))}
+          required
+        />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          value={formData.password}
+          onChange={handleChange}
+          required
+        />
+        <input
+          type="number"
+          name="age"
+          placeholder="Age"
+          value={formData.age}
+          onChange={handleChange}
+          required
+        />
+        <select
+          name="role"
+          value={formData.role}
+          onChange={handleChange}
+          required
+        >
+          <option value="">Select Role</option>
+          <option value="User">User</option>
+          <option value="Organizer">Organizer</option>
+          <option value="Admin">Admin</option>
+        </select>
+        <button type="submit">Register</button>
+      </form>
+    </div>
   );
-}
+};
 
-export default RegisterForm;
+export default Register;

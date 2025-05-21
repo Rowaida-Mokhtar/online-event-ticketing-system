@@ -6,17 +6,16 @@ require("dotenv").config();
 const secretKey = process.env.SECRET_KEY;
 const otpStore = {};
 
-
 const userController = {
   register: async (req, res) => {
     try {
       const { email, password, name, role, age } = req.body;
 
-      if (!email ||! password || !name|| !age) {
+      if (!email || !password || !name || !age) {
         return res.status(400).json({ message: "Missing fields" });
       }
 
-      const existingUser = await User.findOne({ email });
+      const existingUser = await User.findOne({ email: email.toLowerCase() });
       if (existingUser) {
         return res.status(409).json({ message: "User already exists" });
       }
@@ -24,7 +23,7 @@ const userController = {
       const hashedPassword = await bcrypt.hash(password, 10);
 
       const newUser = new User({
-        email,
+        email: email.toLowerCase(), // normalize
         password: hashedPassword,
         name,
         role,
@@ -44,10 +43,11 @@ const userController = {
     try {
       const { email, password } = req.body;
 
-  if (!email || !password) {
-  return res.status(400).json({ message: "Email and password are required" });
- }
-      const user = await User.findOne({ email });
+      if (!email || !password) {
+        return res.status(400).json({ message: "Email and password are required" });
+      }
+
+      const user = await User.findOne({ email: email.toLowerCase() }); // normalize
       if (!user) {
         return res.status(404).json({ message: "Email not found" });
       }
@@ -57,25 +57,25 @@ const userController = {
         return res.status(401).json({ message: "Incorrect password" });
       }
 
-    const expiresInMs = 3 * 60 * 60 * 1000; // 3 hours in milliseconds
-    const expiresAt = new Date(Date.now() + expiresInMs);
+      const expiresInMs = 3 * 60 * 60 * 1000; // 3 hours in milliseconds
+      const expiresAt = new Date(Date.now() + expiresInMs);
 
-    const token = jwt.sign(
-      { user: { userId: user._id, role: user.role } },
-      secretKey,
-      { expiresIn: '3h' } // JWT valid for 3 hours
-    );
+      const token = jwt.sign(
+        { user: { userId: user._id, role: user.role } },
+        secretKey,
+        { expiresIn: '3h' } // JWT valid for 3 hours
+      );
 
-
-      return res
-        .cookie("token", token, {
-          expires: expiresAt,
-          httpOnly: true,
-          secure: true,
-          sameSite: "none",
-        })
-        .status(200)
-        .json({ message: "Login successful", user });
+     const isProduction = process.env.NODE_ENV === "production";
+return res
+  .cookie("token", token, {
+    expires: expiresAt,
+    httpOnly: true,
+    secure: isProduction,            // secure=true only in production (HTTPS)
+    sameSite: isProduction ? "none" : "lax",
+  })
+  .status(200)
+  .json({ message: "Login successful", user });
     } catch (error) {
       console.error("Error logging in:", error);
       res.status(500).json({ message: "Server error" });
@@ -90,7 +90,7 @@ const userController = {
 
       // STEP 1: Request OTP
       if (step === "request") {
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email: email.toLowerCase() }); // normalize
         if (!user) return res.status(404).json({ message: "User not found" });
 
         const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -138,7 +138,7 @@ const userController = {
           return res.status(400).json({ message: "Invalid or expired OTP" });
         }
 
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email: email.toLowerCase() }); // normalize
         if (!user) return res.status(404).json({ message: "User not found" });
 
         const hashedPassword = await bcrypt.hash(newPassword, 10);

@@ -10,7 +10,7 @@ function ForgotPasswordForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put('http://localhost:3000/api/v1/forgetPassword', { email });
+      await axios.put('http://localhost:5000/api/v1/forgetPassword', { email });
       setMessage('Password reset link sent to your email.');
     } catch (err) {
       setError('Failed to send password reset email.');

@@ -1,18 +1,34 @@
-// src/App.jsx
-import AppRouter from './router';
+import React from 'react';
+
+// Auth Context
+import { AuthProvider } from './context/AuthContext';
+
+// Components
+import ToastNotification from './shared/ToastNotification';
 import Navbar from './shared/Navbar';
 import Footer from './shared/Footer';
-import ToastNotification from './shared/ToastNotification';
 
+// Routing
+import AppRouter from './router';
+
+// App.js
 function App() {
   return (
-    <>
-      <ToastNotification />
-      <Navbar />
-      <AppRouter />
-      <Footer />
-    </>
+    <AuthProvider>
+      <>
+        <ToastNotification />
+        <Navbar />
+
+        {/* Main Content */}
+        <main className="app-main">
+          <AppRouter />
+        </main>
+
+        <Footer />
+      </>
+    </AuthProvider>
   );
 }
+
 
 export default App;

@@ -1,5 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const path = require('path');
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 require("dotenv").config();
@@ -20,6 +21,9 @@ const { notFound, errorHandler } = require("./Backend/Middleware/errorMiddleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+// app.js
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 
 // CORS Config
 app.use(

@@ -1,13 +1,24 @@
-// src/shared/ProtectedRoute.jsx
-import { Navigate, Outlet } from 'react-router-dom';
+import React from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
+import { AuthContext } from '../../src/context/AuthContext';
 
-function ProtectedRoute({ allowedRoles }) {
-  const user = JSON.parse(localStorage.getItem('user'));
+const ProtectedRoute = ({ allowedRoles, children }) => {
+  const location = useLocation();
+  const { user, loading } = React.useContext(AuthContext);
 
-  if (!user) return <Navigate to="/login" />;
-  if (!allowedRoles.includes(user.role)) return <Navigate to="/unauthorized" />;
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
-  return <Outlet />;
-}
+  if (!user) {
+    return <Navigate to="/login" replace state={{ from: location }} />;
+  }
+
+  if (!allowedRoles.includes(user.role)) {
+    return <Navigate to="/unauthorized" replace />;
+  }
+
+  return children;
+};
 
 export default ProtectedRoute;

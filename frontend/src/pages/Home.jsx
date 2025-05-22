@@ -1,143 +1,129 @@
 import React, { useState, useEffect } from 'react';
-import axios from '../../src/services/axios';
-import EventCard from '../../src/components/events/EventCard';
-import Loader from '../../src/shared/Loader';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
-import Navbar from '../shared/Navbar';
-import Footer from '../shared/Footer';
-import ToastNotification from '../shared/ToastNotification';
+import { FaUser, FaEdit } from 'react-icons/fa';
+import axios from '../services/axios';
 
-//import styles from '../styles/Home.css';
-const Home = () => {
+const Home = ({ user }) => {
   const [events, setEvents] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-
-  const { user } = React.useContext(AuthContext);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  // Fetch approved events
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const res = await axios.get('/events/approved');
-        setEvents(res.data);
+        const res = await axios.get('/events'); 
+        setEvents(res.data || []);
       } catch (err) {
-        setError('Failed to load events. Please try again later.');
-      } finally {
-        setLoading(false);
+        setError('Failed to fetch events');
+        console.error(err);
       }
     };
 
     fetchEvents();
   }, []);
 
-  // Handle booking
-  const handleBookEvent = async (eventId) => {
-    if (!user) {
-      navigate('/login');
-      return;
-    }
-
-    try {
-      await axios.post('/bookings', { eventId });
-      ToastNotification.showSuccess('Booking successful!');
-    } catch (err) {
-      ToastNotification.showError(
-        err.response?.data?.message || 'Booking failed. Please try again.'
-      );
-    }
+  const handleSearch = () => {
+    console.log('Searching for:', searchTerm);
+    // You could add actual search filtering here
   };
-
-  // Scroll functions
-  const scrollLeft = () => {
-    document.querySelector('.event-slider').scrollBy({ left: -300, behavior: 'smooth' });
-  };
-
-  const scrollRight = () => {
-    document.querySelector('.event-slider').scrollBy({ left: 300, behavior: 'smooth' });
-  };
-
-  // Filter events by search term
-  const filteredEvents = events.filter((event) =>
-    event.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   return (
-    <div className="home-page">
-      {/* Header */}
-      <header className="header">
-        <Navbar />
+    <div className="home-container">
+      <div className="header">
+        <h1>Welcome to Your Online Event Ticketing System</h1>
+        <p>Explore, Book, and Enjoy Live Events</p>
+      </div>
 
+      <div
+        className="search-and-icons"
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+      >
         <div className="search-bar">
           <input
             type="text"
-            placeholder="Search Events..."
+            placeholder="Search events..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="search-input"
           />
-          <button className="search-button">🔍</button>
+          <button
+            onClick={handleSearch}
+            style={{ background: 'tomato', border: 'none', padding: '5px 10px', cursor: 'pointer' }}
+          >
+            🔍
+          </button>
         </div>
 
-        <div className="user-icons">
-          <i
-            className="fas fa-user"
+        <div
+          className="user-icons"
+          style={{ display: 'flex', alignItems: 'center', gap: '10px' }}
+        >
+          <FaUser
+            size={24}
             title="Login / Profile"
+            style={{ cursor: 'pointer' }}
             onClick={() => navigate(user ? '/profile' : '/login')}
-          ></i>
+          />
           {user && (
-            <i
-              className="fas fa-edit"
-              title="Update Profile"
+            <FaEdit
+              size={24}
+              title="Edit Profile"
+              style={{ cursor: 'pointer' }}
               onClick={() => navigate('/profile/edit')}
-            ></i>
+            />
           )}
         </div>
-      </header>
+      </div>
 
-      {/* Main Content */}
-      <main className="main-content">
-        <h1 className="hero-title">Welcome to Your Online Event Ticketing System</h1>
-
-        {loading ? (
-          <Loader />
-        ) : error ? (
-          <p className="error-message">{error}</p>
+      <div className="events-section">
+        <h2>Approved Events</h2>
+        {error ? (
+          <p style={{ color: 'red' }}>{error}</p>
+        ) : events.length === 0 ? (
+          <p>No events available.</p>
         ) : (
-          <div className="event-section">
-            <h2 className="section-title">Approved Events</h2>
-
-            <div className="slider-container">
-              <i className="fas fa-arrow-left arrow" onClick={scrollLeft}></i>
-
-              <div className="event-slider">
-                {filteredEvents.length > 0 ? (
-                  filteredEvents.map((event) => (
-                    <EventCard
-                      key={event._id || event.id}
-                      event={event}
-                      onBook={user ? () => handleBookEvent(event._id || event.id) : undefined}
-                    />
-                  ))
-                ) : (
-                  <p>No events found matching your search.</p>
-                )}
+          
+          <div className="event-cards" style={{ maxHeight: '400px', overflowY: 'auto' }}>
+            {events.map((event) => (
+              <div
+                key={event._id}
+                className="event-card"
+                style={{ border: '1px solid #ccc', padding: '1rem', marginBottom: '1rem' }}
+              >
+                {/* Render image if available */}
+                <img
+                
+                  src={event.image || '/placeholder.png'} // Fallback image
+                  alt={event.title || event.name}
+                  style={{
+                    width: '100%',
+                    maxHeight: '200px',
+                    objectFit: 'cover',
+                    marginBottom: '1rem',
+                  }}
+                />
+                <h3>{event.title || event.name}</h3>
+                <p>{event.description}</p>
+                <button onClick={() => navigate(`/events/${event._id}`)}>View Details</button>
               </div>
-
-              <i className="fas fa-arrow-right arrow" onClick={scrollRight}></i>
-            </div>
+            ))}
           </div>
         )}
-      </main>
+      </div>
 
-      {/* Footer */}
-      <Footer />
-
-      {/* Toast Notifications */}
-      <ToastNotification />
+      {!user && (
+        <div className="login-prompt" style={{ textAlign: 'center', marginTop: '20px' }}>
+          <p>
+            <span
+              onClick={() => navigate('/login')}
+              style={{ color: 'blue', cursor: 'pointer' }}
+            >
+              Login / Signup
+            </span>{' '}
+            to book your favorite events!
+          </p>
+        </div>
+      )}
     </div>
   );
 };

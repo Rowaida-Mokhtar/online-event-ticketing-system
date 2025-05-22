@@ -1,14 +1,112 @@
-/* src/styles/Home.module.css */
-.hero {
-  background-image: url('../assets/banner.jpg');
-  background-size: cover;
-  height: 300px;
+.home-page {
+  min-height: 100vh;
+  background-color: #f9f9f9;
+}
+
+.header {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.search-and-icons {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+}
+
+.user-icons i {
+  margin-left: 10px;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.search-button {
+  padding: 8px 16px;
+  margin-left: 8px;
+  background-color: #ff6f61;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.user-icons i {
+  font-size: 20px;
+  margin-left: 16px;
+  color: #333;
+  cursor: pointer;
+}
+
+.hero {
+  background-size: cover;
+  background-position: center;
+  padding: 100px 20px;
   color: white;
   text-align: center;
 }
-.searchBar {
+
+.hero h1 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+.hero p {
+  font-size: 1.2rem;
+}
+
+.main-content {
+  padding: 2rem;
+  text-align: center;
+}
+
+.section-title {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+}
+
+.event-slider-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-x: hidden;
+}
+
+.event-slider {
+  display: flex;
+  overflow-x: auto;
+  gap: 1rem;
+  padding: 1rem 0;
+  scroll-behavior: smooth;
+}
+
+.arrow {
+  font-size: 24px;
+  cursor: pointer;
+  margin: 0 10px;
+  color: #555;
+}
+
+.error-message {
+  color: red;
+}
+.login-prompt {
   margin-top: 20px;
+  font-size: 16px;
 }

@@ -1,129 +1,118 @@
-import React, { useState, useEffect } from 'react';
+// src/pages/Home.jsx
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaUser, FaEdit } from 'react-icons/fa';
+import { FaUser, FaCog, FaBars, FaSignOutAlt, FaCalendarAlt } from 'react-icons/fa';
 import axios from '../services/axios';
+import { AuthContext } from '../context/AuthContext';
+import SidebarMenu from '../components/shared/SidebarMenu';
+import '../styles/Home.css';
 
-const Home = ({ user }) => {
+function useDebounce(value, delay = 300) {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const handler = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(handler);
+  }, [value, delay]);
+  return debounced;
+}
+
+const Home = () => {
   const [events, setEvents] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [error, setError] = useState('');
+  const [showMenu, setShowMenu] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(10);
+  const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
+  const debouncedSearch = useDebounce(searchTerm);
 
   useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const res = await axios.get('/events'); 
-        setEvents(res.data || []);
-      } catch (err) {
-        setError('Failed to fetch events');
-        console.error(err);
-      }
-    };
-
-    fetchEvents();
+    axios.get('/events')
+      .then(res => setEvents(res.data))
+      .catch(console.error);
   }, []);
 
-  const handleSearch = () => {
-    console.log('Searching for:', searchTerm);
-    // You could add actual search filtering here
+  const filteredEvents = events.filter(e =>
+    e.title.toLowerCase().includes(debouncedSearch.toLowerCase())
+  );
+
+  const handleLoadMore = () => setVisibleCount(c => c + 5);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/');
+    } catch {
+      alert('Logout failed');
+    }
   };
 
   return (
     <div className="home-container">
-      <div className="header">
-        <h1>Welcome to Your Online Event Ticketing System</h1>
-        <p>Explore, Book, and Enjoy Live Events</p>
-      </div>
-
-      <div
-        className="search-and-icons"
-        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
-      >
-        <div className="search-bar">
-          <input
-            type="text"
-            placeholder="Search events..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <button
-            onClick={handleSearch}
-            style={{ background: 'tomato', border: 'none', padding: '5px 10px', cursor: 'pointer' }}
-          >
-            🔍
-          </button>
-        </div>
-
-        <div
-          className="user-icons"
-          style={{ display: 'flex', alignItems: 'center', gap: '10px' }}
-        >
-          <FaUser
-            size={24}
-            title="Login / Profile"
-            style={{ cursor: 'pointer' }}
-            onClick={() => navigate(user ? '/profile' : '/login')}
-          />
-          {user && (
-            <FaEdit
-              size={24}
-              title="Edit Profile"
-              style={{ cursor: 'pointer' }}
-              onClick={() => navigate('/profile/edit')}
-            />
-          )}
-        </div>
-      </div>
-
-      <div className="events-section">
-        <h2>Approved Events</h2>
-        {error ? (
-          <p style={{ color: 'red' }}>{error}</p>
-        ) : events.length === 0 ? (
-          <p>No events available.</p>
+      <div className="top-bar">
+        <FaBars className="icon" onClick={() => setShowMenu(!showMenu)} />
+        <input
+          type="text"
+          className="search-input"
+          placeholder="Search events..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        <FaCalendarAlt className="icon" title="View Events" onClick={() => navigate('/events')} />
+        {!user ? (
+          <FaUser className="icon" title="Login / Signup" onClick={() => navigate('/login')} />
         ) : (
-          
-          <div className="event-cards" style={{ maxHeight: '400px', overflowY: 'auto' }}>
-            {events.map((event) => (
-              <div
-                key={event._id}
-                className="event-card"
-                style={{ border: '1px solid #ccc', padding: '1rem', marginBottom: '1rem' }}
-              >
-                {/* Render image if available */}
-                <img
-                
-                  src={event.image || '/placeholder.png'} // Fallback image
-                  alt={event.title || event.name}
-                  style={{
-                    width: '100%',
-                    maxHeight: '200px',
-                    objectFit: 'cover',
-                    marginBottom: '1rem',
-                  }}
-                />
-                <h3>{event.title || event.name}</h3>
-                <p>{event.description}</p>
-                <button onClick={() => navigate(`/events/${event._id}`)}>View Details</button>
-              </div>
-            ))}
-          </div>
+          <FaCog className="icon" title="Settings" onClick={() => setShowSettings(!showSettings)} />
         )}
       </div>
 
-      {!user && (
-        <div className="login-prompt" style={{ textAlign: 'center', marginTop: '20px' }}>
-          <p>
-            <span
-              onClick={() => navigate('/login')}
-              style={{ color: 'blue', cursor: 'pointer' }}
-            >
-              Login / Signup
-            </span>{' '}
-            to book your favorite events!
-          </p>
+      {showSettings && user && (
+        <div className="settings-dropdown">
+          <button onClick={() => navigate('/profile')}>View Profile</button>
+          <button onClick={handleLogout}><FaSignOutAlt /> Logout</button>
         </div>
       )}
+
+      {showMenu && <SidebarMenu role={user?.role} onClose={() => setShowMenu(false)} />}
+
+      <div className="events-grid no-images">
+        {filteredEvents.length > 0 ? (
+          filteredEvents.slice(0, visibleCount).map(event => (
+            <div key={event._id} className="event-card">
+              <h3>{event.title}</h3>
+              <p><strong>Date:</strong> {new Date(event.date).toLocaleDateString()}</p>
+              <div className="event-actions">
+                <button onClick={() => navigate(`/events/${event._id}`)}>More Info</button>
+                {user?.role?.toLowerCase() === 'user' && event.remainingTickets > 0 && (
+                  <button onClick={() => navigate(`/book/${event._id}`)}>Book Now</button>
+                )}
+              </div>
+            </div>
+          ))
+        ) : (
+          <p style={{ textAlign: 'center' }}>No events found.</p>
+        )}
+      </div>
+
+      {visibleCount < filteredEvents.length && (
+        <div style={{ textAlign: 'center', marginTop: '20px' }}>
+          <button onClick={handleLoadMore}>Load More</button>
+        </div>
+      )}
+
+{!user && (
+  <div style={{ textAlign: 'center', marginTop: '40px', fontSize: '18px' }}>
+    Want to join?{' '}
+    <span style={{ color: '#ff6f61', cursor: 'pointer' }} onClick={() => navigate('/login')}>
+      Login
+    </span>{' '}
+    or{' '}
+    <span style={{ color: '#ff6f61', cursor: 'pointer' }} onClick={() => navigate('/register')}>
+      Sign Up
+    </span>
+  </div>
+)}
+
     </div>
   );
 };

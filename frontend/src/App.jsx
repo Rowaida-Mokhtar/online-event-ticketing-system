@@ -1,34 +1,21 @@
 import React from 'react';
-
-// Auth Context
-import { AuthProvider } from './context/AuthContext';
-
-// Components
-import ToastNotification from './shared/ToastNotification';
-import Navbar from './shared/Navbar';
-import Footer from './shared/Footer';
-
-// Routing
+import { BrowserRouter } from 'react-router-dom';
+import { AuthProvider } from '../src/context/AuthContext';
 import AppRouter from './router';
+import Footer from './components/shared/Footer';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-// App.js
 function App() {
   return (
-    <AuthProvider>
-      <>
-        <ToastNotification />
-        <Navbar />
-
-        {/* Main Content */}
-        <main className="app-main">
-          <AppRouter />
-        </main>
-
+    <BrowserRouter>
+      <AuthProvider>
+        <AppRouter />
         <Footer />
-      </>
-    </AuthProvider>
+        <ToastContainer />
+      </AuthProvider>
+    </BrowserRouter>
   );
 }
-
 
 export default App;

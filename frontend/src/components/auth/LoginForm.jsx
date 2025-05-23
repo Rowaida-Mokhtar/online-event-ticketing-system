@@ -1,53 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { login } from '../../services/axios';  // import login function
+import { AuthContext } from '../../context/AuthContext';
+import { toast } from 'react-toastify';
 
-const Login = () => {
-  const navigate = useNavigate();
+const LoginForm = () => {
+  const { login, user } = useContext(AuthContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errorMsg, setErrorMsg] = useState('');
+  const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  useEffect(() => {
+    if (user) navigate('/');
+  }, [user, navigate]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrorMsg('');
-
     try {
-      const res = await login({ email, password });  // use login function here
-
-      if (res.status === 200) {
-        localStorage.setItem("user", JSON.stringify(res.data.user));
-        navigate('/main');
-      }
+      await login(email, password);
+      toast.success('Logged in successfully');
     } catch (err) {
-      console.error(err);
-      setErrorMsg(err.response?.data?.message || "Login failed");
+      toast.error('Failed to login');
     }
   };
 
   return (
-    <div className="login-container">
-      <h2>Login</h2>
-      {errorMsg && <p style={{ color: "red" }}>{errorMsg}</p>}
-      <form onSubmit={handleLogin}>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value.toLowerCase())}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+    <div className="auth-container">
+      <form onSubmit={handleSubmit} className="auth-form">
+        <h2>Login</h2>
+        <input type="email" placeholder="Email" value={email}
+               onChange={(e) => setEmail(e.target.value)} required />
+        <input type="password" placeholder="Password" value={password}
+               onChange={(e) => setPassword(e.target.value)} required />
         <button type="submit">Login</button>
+        <div className="or-separator">OR</div>
+        <button type="button" onClick={() => navigate('/register')}>Create Account</button>
       </form>
     </div>
   );
 };
 
-export default Login;
+export default LoginForm;

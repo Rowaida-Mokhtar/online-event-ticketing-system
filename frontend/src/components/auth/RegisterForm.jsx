@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { register } from '../../services/axios';
+import api from '../../services/axios';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -21,18 +21,19 @@ const Register = () => {
   };
 
   const handleRegister = async (e) => {
-    e.preventDefault();
-    setErrorMsg('');
+  e.preventDefault();
+  setErrorMsg('');
 
-    try {
-      const res = await register(formData);
-      if (res.status === 201) {
-        navigate('/login');
-      }
-    } catch (err) {
-      setErrorMsg(err.response?.data?.message || 'Registration failed');
+  try {
+    const res = await api.post('/register', formData);
+    
+    if (res.status === 201) {
+      navigate('/login');
     }
-  };
+  } catch (err) {
+    setErrorMsg(err.response?.data?.message || 'Registration failed');
+  }
+};
 
   return (
     <div className="register-container">

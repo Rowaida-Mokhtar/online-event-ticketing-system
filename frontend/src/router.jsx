@@ -1,128 +1,50 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import React, { useContext } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { AuthContext } from './context/AuthContext';
 
-// Pages
 import Home from './pages/Home';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ProfilePage from './pages/ProfilePage';
-// import UpdateProfileForm from './pages/UpdateProfileForm'; // 🔁 Temporarily commented
-// import EventAnalyticsPage from './pages/EventAnalyticsPage'; // 🔁 Temporarily commented
-import EventDetailsPage from './pages/EventDetailsPage';
-import UserBookingsPage from './pages/UserBookingsPage';
+import UserBookingPage from './pages/UserBookingPage';
 import MyEventsPage from './pages/MyEventsPage';
 import EventFormPage from './pages/EventFormPage';
+import EventDetailsPage from './pages/EventDetailsPage';
+import AdminUsersPage from './pages/AdminUsersPage';
 import AdminEventsPage from './pages/AdminEventsPage';
-// import AdminUsersPage from './pages/AdminUsersPage'; // 🔁 Temporarily commented
+//import AnalyticsPage from './pages/AnalyticsPage';
 
-// Protected Route Wrapper
-import ProtectedRoute from './shared/ProtectedRoute';
+import ProtectedRoute from './components/shared/ProtectedRoute';
+import EventAnalytics from './components/events/EventAnalytics';
 
-function AppRouter() {
+const AppRouter = () => {
+  const { user } = useContext(AuthContext);
+
   return (
     <Routes>
-      {/* Public Routes */}
-      <Route path="/" element={<Home />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/" element={<Home user={user} />} />
+      <Route path="/login" element={!user ? <LoginPage /> : <Navigate to="/" />} />
+      <Route path="/register" element={!user ? <RegisterPage /> : <Navigate to="/login" />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
-      {/* User Routes - Standard User */}
-      <Route
-        path="/profile"
-        element={
-          <ProtectedRoute allowedRoles={['Standard User', 'Event Organizer', 'Admin']}>
-            <ProfilePage />
-          </ProtectedRoute>
-        }
-      />
-      {/* 
-      <Route
-        path="/profile/edit"
-        element={
-          <ProtectedRoute allowedRoles={['Standard User', 'Event Organizer', 'Admin']}>
-            <UpdateProfileForm />
-          </ProtectedRoute>
-        }
-      /> 
-      */}
-
-      <Route
-        path="/bookings"
-        element={
-          <ProtectedRoute allowedRoles={['Standard User']}>
-            <UserBookingsPage />
-          </ProtectedRoute>
-        }
-      />
-
-      {/* Event Organizer Routes */}
-      <Route
-        path="/my-events"
-        element={
-          <ProtectedRoute allowedRoles={['Event Organizer']}>
-            <MyEventsPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/my-events/new"
-        element={
-          <ProtectedRoute allowedRoles={['Event Organizer']}>
-            <EventFormPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/my-events/:id/edit"
-        element={
-          <ProtectedRoute allowedRoles={['Event Organizer']}>
-            <EventFormPage />
-          </ProtectedRoute>
-        }
-      />
-      {/* 
-      <Route
-        path="/my-events/analytics"
-        element={
-          <ProtectedRoute allowedRoles={['Event Organizer']}>
-            <EventAnalyticsPage />
-          </ProtectedRoute>
-        }
-      /> 
-      */}
-
-      {/* Admin Routes */}
-      <Route
-        path="/admin/events"
-        element={
-          <ProtectedRoute allowedRoles={['Admin']}>
-            <AdminEventsPage />
-          </ProtectedRoute>
-        }
-      />
-      {/* 
-      <Route
-        path="/admin/users"
-        element={
-          <ProtectedRoute allowedRoles={['Admin']}>
-            <AdminUsersPage />
-          </ProtectedRoute>
-        }
-      /> 
-      */}
-
-      {/* Event Details (Public) */}
+      <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+      <Route path="/book/:id" element={<ProtectedRoute role="User"><UserBookingPage /></ProtectedRoute>} />
       <Route path="/events/:id" element={<EventDetailsPage />} />
 
-      {/* 404 - Not Found */}
-      <Route
-        path="*"
-        element={<div className="text-center mt-10 text-red-500">404 - Page Not Found</div>}
-      />
+      {/* Organizer-only routes */}
+      <Route path="/my-events" element={<ProtectedRoute role="Organizer"><MyEventsPage /></ProtectedRoute>} />
+      <Route path="/my-events/new" element={<ProtectedRoute role="Organizer"><EventFormPage /></ProtectedRoute>} />
+      <Route path="/my-events/:id/edit" element={<ProtectedRoute role="Organizer"><EventFormPage /></ProtectedRoute>} />
+      <Route path="/my-events/analytics" element={<ProtectedRoute role="Organizer"><EventAnalytics /></ProtectedRoute>} />
+
+      {/* Admin-only routes */}
+<Route path="/admin/users" element={<ProtectedRoute role="Admin"><AdminUsersPage /></ProtectedRoute>} />
+      <Route path="/admin/events" element={<ProtectedRoute role="Admin"><AdminEventsPage /></ProtectedRoute>} />
+
+      <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
-}
+};
 
 export default AppRouter;

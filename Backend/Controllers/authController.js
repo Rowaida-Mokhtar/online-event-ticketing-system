@@ -26,7 +26,7 @@ const userController = {
         email: email.toLowerCase(), // normalize
         password: hashedPassword,
         name,
-        role,
+        role:role ||'user',
         age,
       });
 
@@ -156,6 +156,20 @@ return res
       res.status(500).json({ message: "Server error" });
     }
   },
+
+logout: (req, res) => {
+  const isProduction = process.env.NODE_ENV === "production";
+
+  return res
+    .cookie("token", "", {
+      httpOnly: true,
+      expires: new Date(0), // Expire immediately
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+    })
+    .status(200)
+    .json({ message: "Logout successful" });
+}
 };
 
 module.exports = userController;

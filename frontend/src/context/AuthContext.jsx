@@ -5,36 +5,38 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+
+  const fetchProfile = async () => {
+    try {
+      const res = await axios.get('/users/profile');
+      setUser(res.data);
+    } catch (err) {
+      setUser(null);
+    }
+  };
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await axios.get('/auth/me');
-        setUser(res.data);
-      } catch (err) {
-        setUser(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUser();
+    fetchProfile(); // Load user if cookie exists
   }, []);
 
   const login = async (email, password) => {
-    const res = await axios.post('/auth/login', { email, password });
-    setUser(res.data.user);
+    await axios.post('/login', { email, password });
+    await fetchProfile();
+  };
+
+  const register = async ({ name, email, password, role }) => {
+    await axios.post('/register', { name, email, password, role });
+    await fetchProfile(); // Ensure user is loaded immediately after register
   };
 
   const logout = async () => {
-    await axios.post('/auth/logout');
+    await axios.get('/logOut');
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
-      {!loading && children}
+    <AuthContext.Provider value={{ user, login, register, logout }}>
+      {children}
     </AuthContext.Provider>
   );
 };

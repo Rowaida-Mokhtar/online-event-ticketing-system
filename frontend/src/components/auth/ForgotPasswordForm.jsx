@@ -1,31 +1,30 @@
-// ForgotPasswordForm.jsx
 import React, { useState } from 'react';
-import axios from 'axios';
+import axios from '../../services/axios';
+import { toast } from 'react-toastify';
 
-function ForgotPasswordForm() {
+const ForgotPassword = () => {
   const [email, setEmail] = useState('');
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put('http://localhost:5000/api/v1/forgetPassword', { email });
-      setMessage('Password reset link sent to your email.');
-    } catch (err) {
-      setError('Failed to send password reset email.');
+      await axios.put('/forgetPassword', { email });
+      toast.success('Reset link sent');
+    } catch {
+      toast.error('Error sending link');
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Reset Password</h2>
-      {message && <p style={{ color: 'green' }}>{message}</p>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-      <button type="submit">Send Reset Link</button>
-    </form>
+    <div className="auth-container">
+      <form onSubmit={handleSubmit} className="auth-form">
+        <h2>Forgot Password</h2>
+        <input type="email" placeholder="Enter your email" value={email}
+               onChange={(e) => setEmail(e.target.value)} required />
+        <button type="submit">Send Reset Link</button>
+      </form>
+    </div>
   );
-}
+};
 
-export default ForgotPasswordForm;
+export default ForgotPassword;

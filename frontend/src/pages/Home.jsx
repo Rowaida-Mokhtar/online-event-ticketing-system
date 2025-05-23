@@ -22,14 +22,29 @@ const Home = () => {
   const [showMenu, setShowMenu] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [visibleCount, setVisibleCount] = useState(10);
+  const [loading, setLoading] = useState(true);   // Loading state
+  const [error, setError] = useState(null);      // Error state
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const debouncedSearch = useDebounce(searchTerm);
 
   useEffect(() => {
     axios.get('/events')
-      .then(res => setEvents(res.data))
-      .catch(console.error);
+      .then(res => {
+        if (res.data.length === 0) {
+          setError('There are no upcoming events.');
+        } else {
+          setEvents(res.data);
+          setError(null);
+        }
+      })
+      .catch(err => {
+        console.error('Error fetching events:', err);
+        setError('Failed to load events. Please try again later.');
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
   const filteredEvents = events.filter(e =>
@@ -76,7 +91,11 @@ const Home = () => {
       {showMenu && <SidebarMenu role={user?.role} onClose={() => setShowMenu(false)} />}
 
       <div className="events-grid no-images">
-        {filteredEvents.length > 0 ? (
+        {loading ? (
+          <p style={{ textAlign: 'center' }}>Loading events...</p>
+        ) : error ? (
+          <p style={{ textAlign: 'center', color: 'red' }}>{error}</p>
+        ) : filteredEvents.length > 0 ? (
           filteredEvents.slice(0, visibleCount).map(event => (
             <div key={event._id} className="event-card">
               <h3>{event.title}</h3>
@@ -90,7 +109,7 @@ const Home = () => {
             </div>
           ))
         ) : (
-          <p style={{ textAlign: 'center' }}>No events found.</p>
+          <p style={{ textAlign: 'center' }}>No matching events found.</p>
         )}
       </div>
 
@@ -100,18 +119,18 @@ const Home = () => {
         </div>
       )}
 
-{!user && (
-  <div style={{ textAlign: 'center', marginTop: '40px', fontSize: '18px' }}>
-    Want to join?{' '}
-    <span style={{ color: '#ff6f61', cursor: 'pointer' }} onClick={() => navigate('/login')}>
-      Login
-    </span>{' '}
-    or{' '}
-    <span style={{ color: '#ff6f61', cursor: 'pointer' }} onClick={() => navigate('/register')}>
-      Sign Up
-    </span>
-  </div>
-)}
+      {!user && (
+        <div style={{ textAlign: 'center', marginTop: '40px', fontSize: '18px' }}>
+          Want to join?{' '}
+          <span style={{ color: '#ff6f61', cursor: 'pointer' }} onClick={() => navigate('/login')}>
+            Login
+          </span>{' '}
+          or{' '}
+          <span style={{ color: '#ff6f61', cursor: 'pointer' }} onClick={() => navigate('/register')}>
+            Sign Up
+          </span>
+        </div>
+      )}
 
     </div>
   );

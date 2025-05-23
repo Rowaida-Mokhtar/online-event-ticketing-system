@@ -6,6 +6,7 @@ import Home from './pages/Home';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage'; // new
 import ProfilePage from './pages/ProfilePage';
 import UserBookingPage from './pages/UserBookingPage';
 import MyEventsPage from './pages/MyEventsPage';
@@ -13,36 +14,41 @@ import EventFormPage from './pages/EventFormPage';
 import EventDetailsPage from './pages/EventDetailsPage';
 import AdminUsersPage from './pages/AdminUsersPage';
 import AdminEventsPage from './pages/AdminEventsPage';
-//import AnalyticsPage from './pages/AnalyticsPage';
+import EventAnalytics from './components/events/EventAnalytics';
 
 import ProtectedRoute from './components/shared/ProtectedRoute';
-import EventAnalytics from './components/events/EventAnalytics';
 
 const AppRouter = () => {
   const { user } = useContext(AuthContext);
 
   return (
     <Routes>
+      {/* Public Pages */}
       <Route path="/" element={<Home user={user} />} />
-      <Route path="/login" element={!user ? <LoginPage /> : <Navigate to="/" />} />
-      <Route path="/register" element={!user ? <RegisterPage /> : <Navigate to="/login" />} />
+      <Route path="/login" element={!user ? <LoginPage /> : <Navigate to="/" replace />} />
+      <Route path="/register" element={!user ? <RegisterPage /> : <Navigate to="/" replace />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
 
-      <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-      <Route path="/book/:id" element={<ProtectedRoute role="User"><UserBookingPage /></ProtectedRoute>} />
+      {/* Public Event Detail */}
       <Route path="/events/:id" element={<EventDetailsPage />} />
 
-      {/* Organizer-only routes */}
+      {/* Protected Routes */}
+      <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+      <Route path="/bookings" element={<ProtectedRoute role="User"><UserBookingPage /></ProtectedRoute>} />
+
+      {/* Organizer Only */}
       <Route path="/my-events" element={<ProtectedRoute role="Organizer"><MyEventsPage /></ProtectedRoute>} />
       <Route path="/my-events/new" element={<ProtectedRoute role="Organizer"><EventFormPage /></ProtectedRoute>} />
       <Route path="/my-events/:id/edit" element={<ProtectedRoute role="Organizer"><EventFormPage /></ProtectedRoute>} />
       <Route path="/my-events/analytics" element={<ProtectedRoute role="Organizer"><EventAnalytics /></ProtectedRoute>} />
 
-      {/* Admin-only routes */}
-<Route path="/admin/users" element={<ProtectedRoute role="Admin"><AdminUsersPage /></ProtectedRoute>} />
+      {/* Admin Only */}
+      <Route path="/admin/users" element={<ProtectedRoute role="Admin"><AdminUsersPage /></ProtectedRoute>} />
       <Route path="/admin/events" element={<ProtectedRoute role="Admin"><AdminEventsPage /></ProtectedRoute>} />
 
-      <Route path="*" element={<Navigate to="/" />} />
+      {/* Fallback */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 };

@@ -33,7 +33,14 @@ const LoginForm = () => {
                onChange={(e) => setPassword(e.target.value)} required />
         <button type="submit">Login</button>
         <div className="or-separator">OR</div>
-        <button type="button" onClick={() => navigate('/register')}>Create Account</button>
+<button type="button" onClick={() => navigate('/register')}>Create Account</button>
+<button 
+  type="button" 
+  className="link-button" 
+  onClick={() => navigate('/forgot-password')}
+>
+  Forgot Password?
+</button>
       </form>
     </div>
   );

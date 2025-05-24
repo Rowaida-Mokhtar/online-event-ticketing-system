@@ -91,8 +91,8 @@ const deleteUser = async (req, res) => {
 // @desc Get user bookings (user only)
 const getUserBookings = async (req, res) => {
   try {
-    const bookings = await Booking.find({ user: req.user._id });
-    
+const bookings = await Booking.find({ user: req.user.id }).populate('event');
+res.json(bookings);
     if (bookings.length === 0) {
       return res.status(200).json({ message: 'No bookings found for this user.' });
     }

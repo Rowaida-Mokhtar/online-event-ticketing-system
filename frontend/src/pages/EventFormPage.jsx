@@ -1,5 +1,5 @@
 import React from 'react';
-import EventForm from '../components/events/EventForm'; // or wherever it is
+import EventForm from '../components/events/EventForm'; 
 
 const EventFormPage = () => (
   <div>
@@ -8,4 +8,4 @@ const EventFormPage = () => (
   </div>
 );
 
-export default EventFormPage; // ✅ this is critical!
+export default EventFormPage; 

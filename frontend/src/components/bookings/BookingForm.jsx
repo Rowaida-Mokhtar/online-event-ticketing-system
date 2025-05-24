@@ -23,15 +23,14 @@ const BookingForm = ({ event }) => {
     try {
       // Make API request to your backend
       const response = await axios.post('/bookings', {
-        eventId: event._id,
-        numberOfTickets: quantity
-      }, {
-        headers: {
-          'Content-Type': 'application/json',
-          // Include authorization if needed
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
+  eventId: event._id,
+  numberOfTickets: quantity
+}, {
+  withCredentials: true, // ✅ This sends cookies with the request
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
 
       // Handle successful booking
       if (response.data && response.data.success) {

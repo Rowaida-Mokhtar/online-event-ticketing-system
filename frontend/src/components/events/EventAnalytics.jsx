@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import axios from '../../services/axios';
 
+
 const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#a4de6c', '#d0ed57'];
 
 const EventAnalytics = () => {
@@ -9,9 +10,16 @@ const EventAnalytics = () => {
 
   useEffect(() => {
   axios.get('/users/events/analytics')
-    .then(res => setData(res.data)) // res.data = [{ name: 'Event A', value: 20 }, ...]
+    .then(res => {
+      const transformed = res.data.eventStats.map(stat => ({
+        name: stat.eventName,
+        value: stat.ticketsSold
+      }));
+      setData(transformed);
+    })
     .catch(err => console.error('Failed to load analytics', err));
 }, []);
+
 
 
   return (

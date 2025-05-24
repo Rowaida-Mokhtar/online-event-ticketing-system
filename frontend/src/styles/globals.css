@@ -124,3 +124,54 @@ body {
   text-align: center;
   padding: 20px;
 }
+.sidebar-menu {
+  width: 250px;
+  height: 100vh;
+  background: #2c3e50;
+  color: white;
+  padding: 20px 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+.menu-group {
+  margin-bottom: 25px;
+}
+
+.menu-group-title {
+  color: #ecf0f1;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  padding: 0 20px;
+  margin-bottom: 10px;
+}
+
+.menu-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.menu-item:hover {
+  background-color: #34495e;
+}
+
+.menu-icon {
+  margin-right: 15px;
+  font-size: 1rem;
+}
+
+.menu-label {
+  font-size: 0.95rem;
+}

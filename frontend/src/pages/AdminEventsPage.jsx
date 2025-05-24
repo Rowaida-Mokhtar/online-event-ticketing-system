@@ -5,7 +5,7 @@ const AdminEventsPage = () => {
   const [events, setEvents] = useState([]);
 
   useEffect(() => {
-    axios.get('/events') // Assuming /events returns all events for admin
+    axios.get('/events/all') // Assuming /events returns all events for admin
       .then(res => setEvents(res.data))
       .catch(err => console.error('Failed to load events', err));
   }, []);
@@ -22,6 +22,7 @@ const AdminEventsPage = () => {
   return (
     <div style={{ padding: '30px' }}>
       <h2>All Events (Admin)</h2>
+
       {events.map(event => (
         <div key={event._id} style={{ border: '1px solid #ddd', padding: '20px', marginBottom: '20px' }}>
           <h3>{event.title}</h3>

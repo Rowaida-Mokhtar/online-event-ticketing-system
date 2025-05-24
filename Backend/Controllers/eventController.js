@@ -45,6 +45,9 @@ const getApprovedEvents = async (req, res) => {
 };
 
 const getAllEvents = async (req, res) => {
+  console.log("Admin request received by /events/all");
+  // continue...
+
   try {
     const events = await Event.find({});
     if (events.length === 0) {

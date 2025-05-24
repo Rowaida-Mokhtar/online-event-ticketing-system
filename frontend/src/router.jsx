@@ -19,12 +19,16 @@ import EventAnalytics from './components/events/EventAnalytics';
 import ProtectedRoute from './components/shared/ProtectedRoute';
 
 const AppRouter = () => {
-  const { user } = useContext(AuthContext);
+  const { user, loading } = useContext(AuthContext);
+
+  if (loading) {
+    return <div>Loading application...</div>;
+  }
 
   return (
     <Routes>
       {/* Public Pages */}
-      <Route path="/" element={<Home user={user} />} />
+      <Route path="/" element={<Home />} />
       <Route path="/login" element={!user ? <LoginPage /> : <Navigate to="/" replace />} />
       <Route path="/register" element={!user ? <RegisterPage /> : <Navigate to="/" replace />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
@@ -35,17 +39,17 @@ const AppRouter = () => {
 
       {/* Protected Routes */}
       <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-      <Route path="/bookings" element={<ProtectedRoute role="User"><UserBookingPage /></ProtectedRoute>} />
+      <Route path="/bookings" element={<ProtectedRoute role="user"><UserBookingPage /></ProtectedRoute>} />
 
       {/* Organizer Only */}
-      <Route path="/my-events" element={<ProtectedRoute role="Organizer"><MyEventsPage /></ProtectedRoute>} />
-      <Route path="/my-events/new" element={<ProtectedRoute role="Organizer"><EventFormPage /></ProtectedRoute>} />
-      <Route path="/my-events/:id/edit" element={<ProtectedRoute role="Organizer"><EventFormPage /></ProtectedRoute>} />
-      <Route path="/my-events/analytics" element={<ProtectedRoute role="Organizer"><EventAnalytics /></ProtectedRoute>} />
+      <Route path="/my-events" element={<ProtectedRoute role="organizer"><MyEventsPage /></ProtectedRoute>} />
+      <Route path="/my-events/new" element={<ProtectedRoute role="organizer"><EventFormPage /></ProtectedRoute>} />
+      <Route path="/my-events/:id/edit" element={<ProtectedRoute role="organizer"><EventFormPage /></ProtectedRoute>} />
+      <Route path="/my-events/analytics" element={<ProtectedRoute role="organizer"><EventAnalytics /></ProtectedRoute>} />
 
       {/* Admin Only */}
-      <Route path="/admin/users" element={<ProtectedRoute role="Admin"><AdminUsersPage /></ProtectedRoute>} />
-      <Route path="/admin/events" element={<ProtectedRoute role="Admin"><AdminEventsPage /></ProtectedRoute>} />
+      <Route path="/admin/users" element={<ProtectedRoute role="admin"><AdminUsersPage /></ProtectedRoute>} />
+      <Route path="/admin/events" element={<ProtectedRoute role="admin"><AdminEventsPage /></ProtectedRoute>} />
 
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />

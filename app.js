@@ -28,7 +28,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // CORS Config
 app.use(
   cors({
-    origin: process.env.ORIGIN || "http://localhost:5000",
+    origin: process.env.ORIGIN,
     methods: ["GET", "POST", "DELETE", "PUT"],
     credentials: true,
   })

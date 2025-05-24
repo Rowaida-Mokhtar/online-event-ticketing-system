@@ -2,7 +2,7 @@
 function Footer() {
   return (
     <footer className="bg-gray-200 text-center py-4 mt-10">
-      © 2025 Eventify | Contact us: support@eventify.com
+      © 2025 RS | Contact us: SE123@gmail.com
     </footer>
   );
 }

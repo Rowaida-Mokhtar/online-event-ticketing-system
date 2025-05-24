@@ -1,4 +1,3 @@
-/* src/styles/globals.css */
 * {
   margin: 0;
   padding: 0;
@@ -7,9 +6,23 @@
 
 body {
   font-family: 'Arial', sans-serif;
-  background-color: #f4f4f4;
-  color: #333;
+  background-color: #121212; /* Dark background */
+  color: #e0e0e0;             /* Light text */
 }
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+footer {
+  background-color: #f4c2c2 !important; /* Baby pink */
+  color: #333;                          /* Dark readable text */
+  padding: 1rem;
+  text-align: center;
+}
+
 .link-button {
   background: none;
   border: none;
@@ -23,6 +36,7 @@ body {
 .link-button:hover {
   color: #0056b3;
 }
+
 /* Booking Form */
 .booking-form-container {
   max-width: 500px;
@@ -124,6 +138,7 @@ body {
   text-align: center;
   padding: 20px;
 }
+
 .sidebar-menu {
   width: 250px;
   height: 100vh;
@@ -174,4 +189,72 @@ body {
 
 .menu-label {
   font-size: 0.95rem;
+}
+
+/* === LANDING PAGE STYLES === */
+
+.hero-smooth-color {
+  background-color: #121212; /* Dark background */
+  color: #e0e0e0;            /* Light text */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 90vh;
+  padding: 0 30px;
+  text-align: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.hero-content {
+  max-width: 600px;
+}
+
+.hero-smooth-color h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 0.6rem;
+  /* Gradient text for a smooth colorful effect */
+  background: linear-gradient(45deg, #ff6a00, #ee0979, #8e2de2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-smooth-color p {
+  font-size: 1.3rem;
+  margin-bottom: 1.5rem;
+  color: #bbb; /* Soft gray for easy reading */
+  line-height: 1.5;
+}
+
+.btn-gradient {
+  background: linear-gradient(135deg, #00c6ff, #0072ff);
+  border: none;
+  padding: 14px 40px;
+  font-size: 1.2rem;
+  color: white;
+  border-radius: 25px;
+  cursor: pointer;
+  box-shadow: 0 0 15px rgba(0, 114, 255, 0.7);
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+
+.btn-gradient:hover {
+  background: linear-gradient(135deg, #ff4e50, #f9d423);
+  box-shadow: 0 0 20px rgba(249, 212, 35, 0.8);
+  transform: scale(1.05);
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .hero-smooth-color h1 {
+    font-size: 2.2rem;
+  }
+  .hero-smooth-color p {
+    font-size: 1.1rem;
+  }
+  .btn-gradient {
+    padding: 12px 30px;
+    font-size: 1rem;
+  }
 }

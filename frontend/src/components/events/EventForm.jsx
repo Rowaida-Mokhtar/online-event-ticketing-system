@@ -18,7 +18,7 @@ const EventForm = () => {
         setFormData(res.data);
       }).catch(console.error);
     }
-  }, [id]);
+  }, [id, isEdit]); // ✅ Fixed: Added 'isEdit' to dependency array
 
   const handleChange = e => {
     const { name, value } = e.target;

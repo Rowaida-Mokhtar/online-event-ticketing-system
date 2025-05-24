@@ -1,7 +1,8 @@
-// src/shared/Footer.jsx
+import React from 'react';
+
 function Footer() {
   return (
-    <footer className="bg-gray-200 text-center py-4 mt-auto">
+    <footer>
       © 2025 RS | Contact us: SE123@gmail.com
     </footer>
   );

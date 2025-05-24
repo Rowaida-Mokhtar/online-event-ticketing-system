@@ -15,7 +15,7 @@ import EventDetailsPage from './pages/EventDetailsPage';
 import AdminUsersPage from './pages/AdminUsersPage';
 import AdminEventsPage from './pages/AdminEventsPage';
 import EventAnalytics from './components/events/EventAnalytics';
-//import LandingPage from './pages/LandingPage';
+import LandingPage from './pages/LandingPage';
 
 import ProtectedRoute from './components/shared/ProtectedRoute';
 
@@ -29,7 +29,8 @@ const AppRouter = () => {
   return (
     <Routes>
       {/* Public Pages */}
-      <Route path="/" element={<Home />} />
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/Home" element={<Home />} />
       <Route path="/login" element={!user ? <LoginPage /> : <Navigate to="/" replace />} />
       <Route path="/register" element={!user ? <RegisterPage /> : <Navigate to="/" replace />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />

@@ -15,6 +15,7 @@ import EventDetailsPage from './pages/EventDetailsPage';
 import AdminUsersPage from './pages/AdminUsersPage';
 import AdminEventsPage from './pages/AdminEventsPage';
 import EventAnalytics from './components/events/EventAnalytics';
+//import LandingPage from './pages/LandingPage';
 
 import ProtectedRoute from './components/shared/ProtectedRoute';
 

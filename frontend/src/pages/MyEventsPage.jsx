@@ -1,9 +1,9 @@
-// src/pages/MyEventsPage.jsx
+// MyEventsPage.jsx
 import React, { useEffect, useState, useContext } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import axios from '../services/axios';
 import { AuthContext } from '../context/AuthContext';
-import EventCard from '../components/events/EventCard'; // Import the EventCard
+import EventCard from '../components/events/EventCard';
 
 const MyEventsPage = () => {
   const [events, setEvents] = useState([]);
@@ -13,17 +13,30 @@ const MyEventsPage = () => {
   const { user } = useContext(AuthContext);
 
   useEffect(() => {
-    axios.get('/users/events')
-      .then(res => {
-        setEvents(res.data);
-        setLoading(false);
-      })
-      .catch(err => {
-        setError("Failed to load your events.");
-        console.error('Failed to load events', err);
-        setLoading(false);
-      });
-  }, []);
+  axios.get('/users/events')
+    .then(res => {
+      // ✅ Ensure res.data is an array before setting state
+      const data = Array.isArray(res.data) ? res.data : [];
+      setEvents(data);
+      setLoading(false);
+    })
+    .catch(err => {
+      setError("Failed to load your events.");
+      console.error('Failed to load events', err);
+      setLoading(false);
+    });
+}, []);
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this event?')) return;
+
+    try {
+      await axios.delete(`/events/${id}`);
+      setEvents(events.filter(event => event._id !== id));
+    } catch (err) {
+      alert('Failed to delete event');
+      console.error('Error deleting event:', err);
+    }
+  };
 
   if (!user || user.role.toLowerCase() !== 'organizer') {
     return <Navigate to="/unauthorized" replace />;
@@ -55,17 +68,18 @@ const MyEventsPage = () => {
       ) : events.length === 0 ? (
         <p style={{ textAlign: 'center' }}>No events found. Create one to get started!</p>
       ) : (
-        <div className="events-grid">
+        <div className="events-grid" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
           {events.map(event => (
             <EventCard
               key={event._id}
               title={event.title}
               date={new Date(event.date).toLocaleDateString()}
               venue={event.location}
-              imageUrl={event.image || '/images/event-default.jpg'} // fallback image
-              organizerLogo={event.organizerLogo || '/images/logo-default.jpg'} // fallback logo
+              imageUrl={event.image || '/images/event-default.jpg'}
+              organizerLogo={event.organizerLogo || '/images/logo-default.jpg'}
               status={event.status}
               onEdit={() => navigate(`/my-events/${event._id}/edit`)}
+              onDelete={() => handleDelete(event._id)}
             />
           ))}
         </div>
@@ -73,4 +87,5 @@ const MyEventsPage = () => {
     </div>
   );
 };
+
 export default MyEventsPage;

@@ -91,9 +91,9 @@ const deleteUser = async (req, res) => {
 // @desc Get user bookings (user only)
 const getUserBookings = async (req, res) => {
   try {
-const bookings = await Booking.find({ user: req.user.id }).populate('event');
-res.json(bookings);
-    if (bookings.length === 0) {
+    const bookings = await Booking.find({ user: req.user.id }).populate('event');
+
+    if (!bookings || bookings.length === 0) {
       return res.status(200).json({ message: 'No bookings found for this user.' });
     }
 
@@ -102,7 +102,6 @@ res.json(bookings);
     res.status(500).json({ message: "Error fetching user bookings", error: error.message });
   }
 };
-
 // @desc Get organizer events (organizer only)
 const getOrganizerEvents = async (req, res) => {
   try {

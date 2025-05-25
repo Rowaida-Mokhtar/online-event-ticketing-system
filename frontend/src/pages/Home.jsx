@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { FaUser, FaCog, FaBars, FaSignOutAlt, FaCalendarAlt } from 'react-icons/fa';
 import axios from '../services/axios';
 import { AuthContext } from '../context/AuthContext';
-//import SidebarMenu from '../components/shared/SidebarMenu';
 import '../styles/Home.css';
 
 function useDebounce(value, delay = 300) {
@@ -20,7 +19,6 @@ const Home = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showMenu, setShowMenu] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [visibleCount, setVisibleCount] = useState(10);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { user, logout } = useContext(AuthContext);
@@ -29,6 +27,29 @@ const Home = () => {
   const [counts, setCounts] = useState({});
   const sidebarRef = useRef(null);
   const settingsRef = useRef(null);
+  const [currentEventIndex, setCurrentEventIndex] = useState(0);
+
+  // Swipe gesture detection
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
+
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.targetTouches[0].clientX;
+  };
+
+  const handleTouchMove = (e) => {
+    touchEndX.current = e.targetTouches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    if (touchStartX.current - touchEndX.current > 50) {
+      goToNext(); // Swipe left → next
+    }
+
+    if (touchEndX.current - touchStartX.current > 50) {
+      goToPrevious(); // Swipe right → prev
+    }
+  };
 
   // Log user for debugging
   useEffect(() => {
@@ -108,7 +129,24 @@ const Home = () => {
     e.title.toLowerCase().includes(debouncedSearch.toLowerCase())
   );
 
-  const handleLoadMore = () => setVisibleCount(c => c + 5);
+  // Keep current index in bounds when filter changes
+  useEffect(() => {
+    if (filteredEvents.length > 0 && currentEventIndex >= filteredEvents.length) {
+      setCurrentEventIndex(0); // Reset to the first event if out of bounds
+    }
+  }, [filteredEvents, currentEventIndex]);
+
+  const goToPrevious = () => {
+    if (filteredEvents.length > 0) {
+      setCurrentEventIndex((prevIndex) => (prevIndex === 0 ? filteredEvents.length - 1 : prevIndex - 1));
+    }
+  };
+
+  const goToNext = () => {
+    if (filteredEvents.length > 0) {
+      setCurrentEventIndex((prevIndex) => (prevIndex === filteredEvents.length - 1 ? 0 : prevIndex + 1));
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -166,106 +204,118 @@ const Home = () => {
         </div>
       )}
 
+      {/* Sidebar Menu */}
       {showMenu && (
-  <div
-    ref={sidebarRef}
-    style={{
-      position: 'absolute',
-      left: 10,
-      top: 60,
-      background: '#fff',
-      border: '1px solid #ccc',
-      borderRadius: 8,
-      boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
-      padding: 16,
-      zIndex: 1000,
-      minWidth: 200,
-    }}
-  >
-    {user?.role?.toLowerCase() === 'user' && (
-      <>
-        <strong>User Menu</strong>
-        <div style={{ cursor: 'pointer', marginBottom: 10 }} onClick={() => { navigate('/bookings'); setShowMenu(false); }}>
-          📄 My Bookings {counts.bookings !== undefined && `(${counts.bookings})`}
-        </div>
-      </>
-    )}
+        <div ref={sidebarRef} className="sidebar-menu">
+          {user?.role?.toLowerCase() === 'user' && (
+            <>
+              <strong>User Menu</strong>
+              <div onClick={() => { navigate('/bookings'); setShowMenu(false); }}>
+                📄 My Bookings {counts.bookings !== undefined && `(${counts.bookings})`}
+              </div>
+            </>
+          )}
 
-    {user?.role?.toLowerCase() === 'organizer' && (
-      <>
-        <strong>Organizer Menu</strong>
-        <div style={{ cursor: 'pointer', marginBottom: 10 }} onClick={() => { navigate('/my-events'); setShowMenu(false); }}>
-          📋 My Events {counts.events !== undefined && `(${counts.events})`}
-        </div>
-        <div style={{ cursor: 'pointer', marginBottom: 10 }} onClick={() => { navigate('/my-events/new'); setShowMenu(false); }}>
-          ➕ Create Event
-        </div>
-        <div style={{ cursor: 'pointer', marginBottom: 10 }} onClick={() => { navigate('/my-events/analytics'); setShowMenu(false); }}>
-          📊 Event Analytics
-        </div>
-      </>
-    )}
+          {user?.role?.toLowerCase() === 'organizer' && (
+            <>
+              <strong>Organizer Menu</strong>
+              <div onClick={() => { navigate('/my-events'); setShowMenu(false); }}>
+                📋 My Events {counts.events !== undefined && `(${counts.events})`}
+              </div>
+              <div onClick={() => { navigate('/my-events/new'); setShowMenu(false); }}>
+                ➕ Create Event
+              </div>
+              <div onClick={() => { navigate('/my-events/analytics'); setShowMenu(false); }}>
+                📊 Event Analytics
+              </div>
+            </>
+          )}
 
-    {user?.role?.toLowerCase() === 'admin' && (
-      <>
-        <strong>Admin Menu</strong>
-        <div style={{ cursor: 'pointer', marginBottom: 10 }} onClick={() => { navigate('/admin/users'); setShowMenu(false); }}>
-          👥 Manage Users {counts.users !== undefined && `(${counts.users})`}
+          {user?.role?.toLowerCase() === 'admin' && (
+            <>
+              <strong>Admin Menu</strong>
+              <div onClick={() => { navigate('/admin/users'); setShowMenu(false); }}>
+                👥 Manage Users {counts.users !== undefined && `(${counts.users})`}
+              </div>
+              <div onClick={() => { navigate('/admin/events'); setShowMenu(false); }}>
+                📁 Manage Events {counts.events !== undefined && `(${counts.events})`}
+              </div>
+            </>
+          )}
+
+          <hr />
+          <div style={{ textAlign: 'center', marginTop: 10 }}>
+            <button
+              onClick={() => setShowMenu(false)}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#007bff',
+                cursor: 'pointer',
+                fontSize: '0.9rem',
+              }}
+            >
+              ← Close
+            </button>
+          </div>
         </div>
-        <div style={{ cursor: 'pointer', marginBottom: 10 }} onClick={() => { navigate('/admin/events'); setShowMenu(false); }}>
-          📁 Manage Events {counts.events !== undefined && `(${counts.events})`}
-        </div>
-      </>
-    )}
+      )}
 
-    <hr />
-    <div style={{ textAlign: 'center', marginTop: 10 }}>
-      <button
-        onClick={() => setShowMenu(false)}
-        style={{
-          background: 'none',
-          border: 'none',
-          color: '#007bff',
-          cursor: 'pointer',
-          fontSize: '0.9rem',
-        }}
-      >
-        ← Close
-      </button>
-    </div>
-  </div>
-)}
+      {/* Event Grid - One at a Time */}
+      {filteredEvents.length > 0 ? (
+        <div
+          className="events-grid no-images"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          {/* Left Arrow */}
+          <button
+            className="nav-arrow left"
+            onClick={goToPrevious}
+            aria-label="Previous Event"
+          >
+            &#8592;
+          </button>
 
-
-      {/* Event List */}
-      <div className="events-grid no-images">
-        {loading ? (
-          <p style={{ textAlign: 'center' }}>Loading events...</p>
-        ) : error ? (
-          <p style={{ textAlign: 'center', color: 'red' }}>{error}</p>
-        ) : filteredEvents.length > 0 ? (
-          filteredEvents.slice(0, visibleCount).map(event => (
-            <div key={event._id} className="event-card">
-              <h3>{event.title}</h3>
-              <p><strong>Date:</strong> {new Date(event.date).toLocaleDateString()}</p>
+          {/* Single Event Card */}
+          <div className="event-list-container">
+            <div className="event-card">
+              <h3>{filteredEvents[currentEventIndex].title}</h3>
+              <p>
+                <strong>Date:</strong>{' '}
+                {new Date(filteredEvents[currentEventIndex].date).toLocaleDateString()}
+              </p>
+              <p>{filteredEvents[currentEventIndex].description || 'No description available.'}</p>
               <div className="event-actions">
-                <button onClick={() => navigate(`/events/${event._id}`)}>More Info</button>
-                {user?.role?.toLowerCase() === 'user' && event.remainingTickets > 0 && (
-                  <button onClick={() => navigate(`/book/${event._id}`)}>Book Now</button>
-                )}
+                <button onClick={() => navigate(`/events/${filteredEvents[currentEventIndex]._id}`)}>
+                  More Info
+                </button>
+                {user?.role?.toLowerCase() === 'user' &&
+                  filteredEvents[currentEventIndex].remainingTickets > 0 && (
+                    <button onClick={() => navigate(`/book/${filteredEvents[currentEventIndex]._id}`)}>
+                      Book Now
+                    </button>
+                  )}
               </div>
             </div>
-          ))
-        ) : (
-          <p style={{ textAlign: 'center' }}>No matching events found.</p>
-        )}
-      </div>
+          </div>
 
-      {/* Load More Button */}
-      {visibleCount < filteredEvents.length && (
-        <div style={{ textAlign: 'center', marginTop: '20px' }}>
-          <button onClick={handleLoadMore}>Load More</button>
+          {/* Right Arrow */}
+          <button
+            className="nav-arrow right"
+            onClick={goToNext}
+            aria-label="Next Event"
+          >
+            &#8594;
+          </button>
         </div>
+      ) : loading ? (
+        <p style={{ textAlign: 'center' }}>Loading events...</p>
+      ) : error ? (
+        <p style={{ textAlign: 'center', color: 'red' }}>{error}</p>
+      ) : (
+        <p style={{ textAlign: 'center' }}>No matching events found.</p>
       )}
 
       {/* Login Prompt for Guests */}

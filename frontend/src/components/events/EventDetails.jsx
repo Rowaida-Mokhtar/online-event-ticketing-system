@@ -1,12 +1,11 @@
-import React, { useEffect, useState, useContext } from 'react';
+// src/components/events/EventDetails.jsx
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from '../../services/axios';
-import { AuthContext } from '../../context/AuthContext';
-import BookingForm from '../bookings/BookingForm';
+import BookingForm from '../bookings/BookingForm'; // ✅ Import BookingForm
 
 const EventDetails = () => {
   const { id } = useParams();
-  const { user } = useContext(AuthContext);
   const [event, setEvent] = useState(null);
   const [imgSrc, setImgSrc] = useState('/placeholder.png');
   const [imgLoading, setImgLoading] = useState(true);
@@ -65,16 +64,8 @@ const EventDetails = () => {
       <p><strong>Remaining Tickets:</strong> {event.remainingTickets}</p>
       <p style={{ marginTop: '20px' }}>{event.description}</p>
 
-      {user?.role?.toLowerCase() === 'user' && event.remainingTickets > 0 && (
-        <div style={{ marginTop: '30px' }}>
-          <h4>Ready to reserve your ticket?</h4>
-          <BookingForm event={event} />
-        </div>
-      )}
-
-      {user?.role?.toLowerCase() === 'user' && event.remainingTickets === 0 && (
-        <p style={{ marginTop: '20px', color: 'red' }}><strong>Sold Out:</strong> No tickets remaining.</p>
-      )}
+      {/* ✅ Add BookingForm here */}
+      <BookingForm event={event} />
     </div>
   );
 };

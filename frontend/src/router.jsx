@@ -16,8 +16,9 @@ import AdminUsersPage from './pages/AdminUsersPage';
 import AdminEventsPage from './pages/AdminEventsPage';
 import EventAnalytics from './components/events/EventAnalytics';
 import LandingPage from './pages/LandingPage';
-
 import ProtectedRoute from './components/shared/ProtectedRoute';
+import BookingDetails from './components/bookings/BookingDetails';
+import EventDetails from './components/events/EventDetails';
 
 const AppRouter = () => {
   const { user, loading } = useContext(AuthContext);
@@ -42,6 +43,9 @@ const AppRouter = () => {
       {/* Protected Routes */}
       <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
       <Route path="/bookings" element={<ProtectedRoute role="user"><UserBookingPage /></ProtectedRoute>} />
+      <Route path="/bookings/:id" element={<ProtectedRoute role="user"><BookingDetails /></ProtectedRoute>} />
+      <Route path="/book/:id" element={<ProtectedRoute role="user"><EventDetails /></ProtectedRoute>} />
+
 
       {/* Organizer Only */}
       <Route path="/my-events" element={<ProtectedRoute role="organizer"><MyEventsPage /></ProtectedRoute>} />

@@ -1,124 +1,83 @@
+// src/components/bookings/BookingForm.jsx
 import React, { useState } from 'react';
-import axios from '../../services/axios'; // Your configured axios instance
-import { useNavigate } from 'react-router-dom';
+import axios from '../../services/axios';
 
 const BookingForm = ({ event }) => {
-  const [quantity, setQuantity] = useState(1);
+  const [numberOfTickets, setNumberOfTickets] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const navigate = useNavigate();
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+
+  // Prevent rendering until event is defined
+  if (!event) {
+    return <p>Loading event details...</p>;
+  }
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    // Client-side validation
-    if (quantity < 1 || quantity > event.remainingTickets) {
-      setError(`Please select between 1 and ${event.remainingTickets} tickets`);
-      return;
-    }
+  e.preventDefault();
+  setLoading(true);
+  setError('');
+  setSuccess('');
 
-    setLoading(true);
-    setError(null);
+  try {
+    await axios.post('/bookings', {
+      eventId: event._id,
+      numberOfTickets
+    });
 
-    try {
-      // Make API request to your backend
-      const response = await axios.post('/bookings', {
-  eventId: event._id,
-  numberOfTickets: quantity
-}, {
-  withCredentials: true, // ✅ This sends cookies with the request
-  headers: {
-    'Content-Type': 'application/json'
+    setSuccess('Booking successful!');
+
+    setTimeout(() => {
+      setSuccess('');
+    }, 3000);
+  } catch (err) {
+    const message = err.response?.data?.message || 'Failed to book tickets.';
+    setError(message);
+  } finally {
+    setLoading(false);
   }
-});
-
-      // Handle successful booking
-      if (response.data && response.data.success) {
-        // Redirect with success state
-        navigate('/my-bookings', { 
-          state: { 
-            bookingSuccess: true,
-            bookingId: response.data.data.booking._id 
-          } 
-        });
-      } else {
-        throw new Error(response.data.message || 'Booking failed');
-      }
-    } catch (err) {
-      console.error('Booking error:', err);
-      // Handle different error scenarios
-      if (err.response) {
-        // The request was made and the server responded with a status code
-        if (err.response.status === 401) {
-          setError('Please login to book tickets');
-        } else if (err.response.status === 400) {
-          setError(err.response.data.message || 'Invalid booking request');
-        } else if (err.response.status === 404) {
-          setError('Event not found');
-        } else {
-          setError(err.response.data.message || 'Booking failed');
-        }
-      } else {
-        // Something happened in setting up the request
-        setError('Network error. Please try again later.');
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+};
 
   return (
-    <div className="booking-form-container">
-      <h3>Book Tickets</h3>
-      
-      {event.remainingTickets === 0 ? (
-        <div className="alert alert-danger">Sold Out</div>
-      ) : event.remainingTickets <= 5 ? (
-        <div className="alert alert-warning">
-          Only {event.remainingTickets} tickets left!
-        </div>
-      ) : (
-        <div className="ticket-availability">
-          {event.remainingTickets} tickets available
-        </div>
-      )}
+    <div>
+      <h4>Book Tickets</h4>
+
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {success && <p style={{ color: 'green' }}>{success}</p>}
 
       <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="ticketQuantity">Number of Tickets:</label>
+        <label>
+          Number of Tickets:
           <input
-            id="ticketQuantity"
             type="number"
             min="1"
             max={event.remainingTickets}
-            value={quantity}
-            onChange={(e) => {
-              const value = Math.max(1, 
-                Math.min(event.remainingTickets, 
-                Number(e.target.value) || 1));
-              setQuantity(value);
-            }}
-            className="form-control"
-            required
-            disabled={event.remainingTickets === 0 || loading}
+            value={numberOfTickets}
+            onChange={(e) =>
+              setNumberOfTickets(Math.max(1, parseInt(e.target.value) || 1))
+            }
+            style={{ marginLeft: '10px', padding: '5px', width: '60px' }}
+            disabled={loading}
           />
-        </div>
+        </label>
 
-        {error && <div className="alert alert-danger">{error}</div>}
+        <br />
 
         <button
           type="submit"
-          className="btn btn-primary btn-block"
-          disabled={loading || event.remainingTickets === 0}
+          disabled={loading}
+          style={{
+            marginTop: '10px',
+            padding: '8px 16px',
+            backgroundColor: '#27ae60',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: loading ? 'not-allowed' : 'pointer'
+          }}
         >
-          {loading ? (
-            <>
-              <span className="spinner-border spinner-border-sm" aria-hidden="true"></span>
-              Processing...
-            </>
-          ) : (
-            'Confirm Booking'
-          )}
+          {loading ? 'Booking...' : 'Confirm Booking'}
         </button>
       </form>
     </div>

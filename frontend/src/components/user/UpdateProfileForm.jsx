@@ -36,9 +36,9 @@ const UpdateProfileForm = () => {
   };
 
   return (
-    <div className="update-profile-container">
-      <form onSubmit={handleSubmit} className="update-profile-form">
-        <h2 className="update-profile-title">Update Profile</h2>
+    <div className="auth-container">
+      <form onSubmit={handleSubmit} className="auth-form">
+        <h2 className="auth-title">My Profile</h2>
         <label>
           Name
           <input
@@ -72,7 +72,7 @@ const UpdateProfileForm = () => {
           />
         </label>
 
-        <button type="submit" disabled={loading} className="update-profile-button">
+        <button type="submit" disabled={loading} className="auth-button">
           {loading ? 'Saving...' : 'Update Profile'}
         </button>
       </form>

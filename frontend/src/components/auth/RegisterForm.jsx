@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../services/axios';
-
+import '../../styles/register.css'
 const Register = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -21,25 +21,25 @@ const Register = () => {
   };
 
   const handleRegister = async (e) => {
-  e.preventDefault();
-  setErrorMsg('');
+    e.preventDefault();
+    setErrorMsg('');
 
-  try {
-    const res = await api.post('/register', formData);
-    
-    if (res.status === 201) {
-      navigate('/login');
+    try {
+      const res = await api.post('/register', formData);
+      
+      if (res.status === 201) {
+        navigate('/login');
+      }
+    } catch (err) {
+      setErrorMsg(err.response?.data?.message || 'Registration failed');
     }
-  } catch (err) {
-    setErrorMsg(err.response?.data?.message || 'Registration failed');
-  }
-};
+  };
 
   return (
     <div className="register-container">
       <h2>Register</h2>
-      {errorMsg && <p style={{ color: 'red' }}>{errorMsg}</p>}
-      <form onSubmit={handleRegister}>
+      {errorMsg && <p className="error-message">{errorMsg}</p>}
+      <form onSubmit={handleRegister} className="register-form">
         <input
           type="text"
           name="name"
@@ -83,7 +83,7 @@ const Register = () => {
           <option value="Organizer">Organizer</option>
           <option value="Admin">Admin</option>
         </select>
-        <button type="submit">Register</button>
+        <button type="submit" className="register-button">Register</button>
       </form>
     </div>
   );

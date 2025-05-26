@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from '../../services/axios';
 
@@ -13,7 +13,7 @@ const EventForm = () => {
     category: '',
     image: '',
     ticketPrice: 0,
-    totalTickets: 0
+    totalTickets: 0,
   });
 
   const handleChange = (e) => {
@@ -33,41 +33,91 @@ const EventForm = () => {
   };
 
   return (
-    <div className="event-form-container" style={{ maxWidth: '500px', margin: '0 auto' }}>
-      <h2>Create Event</h2>
-      <form onSubmit={handleSubmit} className="event-form" style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-        <div>
+    <div className="event-form-container">
+      <form onSubmit={handleSubmit} className="event-form">
+        <div className="form-group">
           <label>Title</label>
-          <input type="text" name="title" value={formData.title} onChange={handleChange} required />
+          <input
+            type="text"
+            name="title"
+            value={formData.title}
+            onChange={handleChange}
+            required
+          />
         </div>
-        <div>
+        <div className="form-group">
           <label>Description</label>
-          <input type="text" name="description" value={formData.description} onChange={handleChange} required />
+          <input
+            type="text"
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            required
+          />
         </div>
-        <div>
+        <div className="form-group">
           <label>Location</label>
-          <input type="text" name="location" value={formData.location} onChange={handleChange} required />
+          <input
+            type="text"
+            name="location"
+            value={formData.location}
+            onChange={handleChange}
+            required
+          />
         </div>
-        <div>
+        <div className="form-group">
           <label>Category</label>
-          <input type="text" name="category" value={formData.category} onChange={handleChange} required />
+          <input
+            type="text"
+            name="category"
+            value={formData.category}
+            onChange={handleChange}
+            required
+          />
         </div>
-        <div>
-          <label>Image URL</label>
-          <input type="text" name="image" value={formData.image} onChange={handleChange} required />
+        <div className="form-group">
+          <label>Image</label>
+          <input
+            type="text"
+            name="image"
+            value={formData.image}
+            onChange={handleChange}
+            required
+          />
         </div>
-        <div>
+        <div className="form-group">
           <label>Date</label>
-          <input type="datetime-local" name="date" value={formData.date} onChange={handleChange} required />
+          <input
+            type="datetime-local"
+            name="date"
+            value={formData.date}
+            onChange={handleChange}
+            required
+          />
         </div>
-        <div>
+        <div className="form-group">
           <label>Ticket Price</label>
-          <input type="number" name="ticketPrice" value={formData.ticketPrice} onChange={handleChange} min="0" required />
+          <input
+            type="number"
+            name="ticketPrice"
+            value={formData.ticketPrice}
+            onChange={handleChange}
+            min="0"
+            required
+          />
         </div>
-        <div>
+        <div className="form-group">
           <label>Total Tickets</label>
-          <input type="number" name="totalTickets" value={formData.totalTickets} onChange={handleChange} min="1" required />
+          <input
+            type="number"
+            name="totalTickets"
+            value={formData.totalTickets}
+            onChange={handleChange}
+            min="1"
+            required
+          />
         </div>
+
         <button type="submit">Create Event</button>
       </form>
     </div>

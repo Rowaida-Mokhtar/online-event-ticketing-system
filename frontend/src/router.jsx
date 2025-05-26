@@ -20,6 +20,7 @@ import ProtectedRoute from './components/shared/ProtectedRoute';
 import BookingDetails from './components/bookings/BookingDetails';
 import EventDetails from './components/events/EventDetails';
 import EventList from './components/events/EventList';
+import UnauthorizedPage from './pages/UnauthorizedPage';
 
 const AppRouter = () => {
   const { user, loading } = useContext(AuthContext);
@@ -38,6 +39,7 @@ const AppRouter = () => {
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
       <Route path="/events" element={<EventList />} />
+      <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
 
       {/* Public Event Detail */}

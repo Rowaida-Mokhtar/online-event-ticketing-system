@@ -1,4 +1,3 @@
-// src/pages/UserBookingsPage.jsx
 import React, { useEffect, useState, useContext } from 'react';
 import axios from '../services/axios';
 import { AuthContext } from '../context/AuthContext';
@@ -15,7 +14,9 @@ const UserBookingsPage = () => {
     if (!user) return;
     axios.get('/users/bookings')
       .then(res => {
-        setBookings(res.data);
+        console.log('API Response:', res.data); // Debug the response
+        // Ensure res.data is an array, default to empty array if not
+        setBookings(Array.isArray(res.data) ? res.data : []);
         setError(null);
       })
       .catch(err => {

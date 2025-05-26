@@ -46,6 +46,22 @@ const AdminEventsPage = () => {
     }
   };
 
+  const buttonStyle = {
+    backgroundColor: '#8e44ad', // Purple background
+    color: 'white',
+    border: 'none',
+    padding: '6px 12px', // Smaller padding for size
+    margin: '0 10px 10px 0', // Space between buttons and bottom margin
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontSize: '14px', // Smaller font size
+    transition: 'background-color 0.3s'
+  };
+
+  const buttonHoverStyle = {
+    backgroundColor: '#783f98' // Darker purple on hover
+  };
+
   return (
     <div style={{ padding: '30px' }}>
       <h2>All Events (Admin)</h2>
@@ -64,35 +80,32 @@ const AdminEventsPage = () => {
           <p><strong>Status:</strong> {event.status}</p>
 
           {event.status !== 'approved' && (
-            <>
-              <button onClick={() => handleApprove(event._id)}>Approve</button>
-              <button
-                onClick={() => handleDecline(event._id)}
-                style={{
-                  marginLeft: '10px',
-                  backgroundColor: '#e74c3c',
-                  color: 'white',
-                  border: 'none',
-                  padding: '6px 12px',
-                  borderRadius: '4px'
-                }}
-              >
-                Decline
-              </button>
-            </>
+            <button
+              onClick={() => handleApprove(event._id)}
+              style={buttonStyle}
+              onMouseEnter={(e) => e.target.style.backgroundColor = buttonHoverStyle.backgroundColor}
+              onMouseLeave={(e) => e.target.style.backgroundColor = buttonStyle.backgroundColor}
+            >
+              Approve
+            </button>
           )}
 
-          {/* Always show Delete button for admin */}
+          {event.status !== 'approved' && (
+            <button
+              onClick={() => handleDecline(event._id)}
+              style={buttonStyle}
+              onMouseEnter={(e) => e.target.style.backgroundColor = buttonHoverStyle.backgroundColor}
+              onMouseLeave={(e) => e.target.style.backgroundColor = buttonStyle.backgroundColor}
+            >
+              Decline
+            </button>
+          )}
+
           <button
             onClick={() => handleDelete(event._id)}
-            style={{
-              marginLeft: '10px',
-              backgroundColor: '#8e44ad',
-              color: 'white',
-              border: 'none',
-              padding: '6px 12px',
-              borderRadius: '4px'
-            }}
+            style={buttonStyle}
+            onMouseEnter={(e) => e.target.style.backgroundColor = buttonHoverStyle.backgroundColor}
+            onMouseLeave={(e) => e.target.style.backgroundColor = buttonStyle.backgroundColor}
           >
             Delete
           </button>

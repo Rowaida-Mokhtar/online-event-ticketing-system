@@ -22,7 +22,6 @@ const AdminUsersPage = () => {
     fetchUsers();
   }, []);
 
-  // Handle delete confirmation
   const handleDeleteClick = (userId) => {
     setConfirmModal({ show: true, userId });
   };
@@ -42,7 +41,6 @@ const AdminUsersPage = () => {
     }
   };
 
-  // Handle role change
   const handleRoleChange = async (userId, newRole) => {
     try {
       const res = await axios.put(`/users/${userId}`, { role: newRole });
@@ -101,8 +99,8 @@ const AdminUsersPage = () => {
                   <button
                     onClick={() => handleDeleteClick(user._id)}
                     style={{
-                      background: 'red',
-                      color: 'white',
+                      background: '#ffc0cb',
+                      color: 'black',
                       border: 'none',
                       padding: '5px 10px',
                       cursor: 'pointer',
@@ -146,8 +144,8 @@ const AdminUsersPage = () => {
               <button
                 onClick={confirmDeleteUser}
                 style={{
-                  background: 'red',
-                  color: 'white',
+                  background: '#ffc0cb',
+                  color: 'black',
                   border: 'none',
                   padding: '6px 12px',
                   marginRight: '10px',
@@ -159,7 +157,8 @@ const AdminUsersPage = () => {
               <button
                 onClick={() => setConfirmModal({ show: false, userId: null })}
                 style={{
-                  background: '#ccc',
+                  background: '#ffc0cb',
+                  color: 'black',
                   border: 'none',
                   padding: '6px 12px',
                   borderRadius: '4px'

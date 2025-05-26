@@ -36,39 +36,47 @@ const UpdateProfileForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ maxWidth: '500px', margin: 'auto', padding: '20px' }}>
-      <h2>Update Profile</h2>
-      <label>Name</label>
-      <input
-        type="text"
-        name="name"
-        value={formData.name}
-        onChange={handleChange}
-        required
-      />
+    <div className="auth-container">
+      <form onSubmit={handleSubmit} className="auth-form">
+        <h2 className="auth-title">My Profile</h2>
+        <label>
+          Name
+          <input
+            type="text"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+          />
+        </label>
 
-      <label>Email</label>
-      <input
-        type="email"
-        name="email"
-        value={formData.email}
-        onChange={handleChange}
-        required
-      />
+        <label>
+          Email
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
+        </label>
 
-      <label>Password</label>
-      <input
-        type="password"
-        name="password"
-        value={formData.password}
-        onChange={handleChange}
-        placeholder="Leave blank to keep unchanged"
-      />
+        <label>
+          Password
+          <input
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            placeholder="Leave blank to keep unchanged"
+          />
+        </label>
 
-      <button type="submit" disabled={loading}>
-        {loading ? 'Saving...' : 'Update Profile'}
-      </button>
-    </form>
+        <button type="submit" disabled={loading} className="auth-button">
+          {loading ? 'Saving...' : 'Update Profile'}
+        </button>
+      </form>
+    </div>
   );
 };
 

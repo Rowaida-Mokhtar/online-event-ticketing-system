@@ -4,20 +4,18 @@ const User = require('../models/User');
 const nodemailer = require('nodemailer');
 require("dotenv").config();
 const secretKey = process.env.SECRET_KEY;
-
-let otpStore = {}; // In-memory OTP store (use Redis or DB in production)
-
-// Generate JWT
-// const generateToken = (id, role) => {
-  // return jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-// };
+const otpStore = {};
 
 const userController = {
   register: async (req, res) => {
     try {
       const { email, password, name, role, age } = req.body;
 
-      const existingUser = await User.findOne({ email });
+      if (!email || !password || !name || !age) {
+        return res.status(400).json({ message: "Missing fields" });
+      }
+
+      const existingUser = await User.findOne({ email: email.toLowerCase() });
       if (existingUser) {
         return res.status(409).json({ message: "User already exists" });
       }
@@ -25,10 +23,10 @@ const userController = {
       const hashedPassword = await bcrypt.hash(password, 10);
 
       const newUser = new User({
-        email,
+        email: email.toLowerCase(), // normalize
         password: hashedPassword,
         name,
-        role,
+        role:role ||'user',
         age,
       });
 
@@ -45,36 +43,39 @@ const userController = {
     try {
       const { email, password } = req.body;
 
-      const user = await User.findOne({ email });
+      if (!email || !password) {
+        return res.status(400).json({ message: "Email and password are required" });
+      }
+
+      const user = await User.findOne({ email: email.toLowerCase() }); // normalize
       if (!user) {
         return res.status(404).json({ message: "Email not found" });
       }
 
       const passwordMatch = await bcrypt.compare(password, user.password);
       if (!passwordMatch) {
-        return res.status(405).json({ message: "Incorrect password" });
+        return res.status(401).json({ message: "Incorrect password" });
       }
 
-      const currentDateTime = new Date();
-      const expiresAt = new Date(+currentDateTime + 1800000); // 30 min
+      const expiresInMs = 3 * 60 * 60 * 1000; // 3 hours in milliseconds
+      const expiresAt = new Date(Date.now() + expiresInMs);
 
       const token = jwt.sign(
         { user: { userId: user._id, role: user.role } },
         secretKey,
-        {
-          expiresIn: 3 * 60 * 60, // 3 hours
-        }
+        { expiresIn: '3h' } // JWT valid for 3 hours
       );
 
-      return res
-        .cookie("token", token, {
-          expires: expiresAt,
-          httpOnly: true,
-          secure: true,
-          sameSite: "none",
-        })
-        .status(200)
-        .json({ message: "Login successful", user });
+     const isProduction = process.env.NODE_ENV === "production";
+return res
+  .cookie("token", token, {
+    expires: expiresAt,
+    httpOnly: true,
+    secure: isProduction,            // secure=true only in production (HTTPS)
+    sameSite: isProduction ? "none" : "lax",
+  })
+  .status(200)
+  .json({ message: "Login successful", user });
     } catch (error) {
       console.error("Error logging in:", error);
       res.status(500).json({ message: "Server error" });
@@ -82,72 +83,93 @@ const userController = {
   },
 
   forgetPassword: async (req, res) => {
-    const { email } = req.body;
+    const { email, otp, newPassword, step } = req.body;
 
     try {
-      const user = await User.findOne({ email });
-      if (!user) return res.status(404).json({ message: 'User not found' });
+      if (!step) return res.status(400).json({ message: "Step is required" });
 
-      const otp = Math.floor(100000 + Math.random() * 900000).toString();
-      otpStore[email] = otp;
+      // STEP 1: Request OTP
+      if (step === "request") {
+        const user = await User.findOne({ email: email.toLowerCase() }); // normalize
+        if (!user) return res.status(404).json({ message: "User not found" });
 
-      const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS,
-        },
-      });
+        const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
+        otpStore[email] = {
+          otp: generatedOtp,
+          expiresAt: Date.now() + 5 * 60 * 1000, // 5 minutes
+        };
 
-      await transporter.sendMail({
-        from: process.env.EMAIL_USER,
-        to: email,
-        subject: 'Password Reset OTP',
-        text: `Your OTP for password reset is: ${otp}`,
-      });
+        const transporter = nodemailer.createTransport({
+          service: "gmail",
+          auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+          },
+        });
 
-      res.status(200).json({ message: 'OTP sent to email' });
+        await transporter.sendMail({
+          from: process.env.EMAIL_USER,
+          to: email,
+          subject: "Password Reset OTP",
+          text: `Your OTP for password reset is: ${generatedOtp}`,
+        });
+
+        return res.status(200).json({ message: "OTP sent to email" });
+      }
+
+      // STEP 2: Verify OTP
+      if (step === "verify") {
+        const record = otpStore[email];
+        if (!record || record.otp !== otp || Date.now() > record.expiresAt) {
+          return res.status(400).json({ message: "Invalid or expired OTP" });
+        }
+
+        return res.status(200).json({ message: "OTP verified" });
+      }
+
+      // STEP 3: Reset Password
+      if (step === "reset") {
+        if (!otp || !newPassword) {
+          return res.status(400).json({ message: "OTP and new password are required" });
+        }
+
+        const record = otpStore[email];
+        if (!record || record.otp !== otp || Date.now() > record.expiresAt) {
+          return res.status(400).json({ message: "Invalid or expired OTP" });
+        }
+
+        const user = await User.findOne({ email: email.toLowerCase() }); // normalize
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        user.password = hashedPassword;
+        await user.save();
+
+        delete otpStore[email];
+
+        return res.status(200).json({ message: "Password reset successfully" });
+      }
+
+      return res.status(400).json({ message: "Invalid step" });
     } catch (err) {
-      res.status(500).json({ message: err.message });
+      console.error("Forget password error:", err);
+      res.status(500).json({ message: "Server error" });
     }
   },
 
-  verifyOtp: async (req, res) => {
-    const { email, otp } = req.body;
+logout: (req, res) => {
+  const isProduction = process.env.NODE_ENV === "production";
 
-    try {
-      if (otpStore[email] !== otp) {
-        return res.status(400).json({ message: 'Invalid OTP' });
-      }
-
-      res.status(200).json({ message: 'OTP verified' });
-    } catch (err) {
-      res.status(500).json({ message: err.message });
-    }
-  },
-
-  resetPassword: async (req, res) => {
-    const { email, newPassword, otp } = req.body;
-
-    try {
-      if (otpStore[email] !== otp) {
-        return res.status(400).json({ message: 'Invalid OTP' });
-      }
-
-      const user = await User.findOne({ email });
-      if (!user) return res.status(404).json({ message: 'User not found' });
-
-      const hashedPassword = await bcrypt.hash(newPassword, 10);
-      user.password = hashedPassword;
-      await user.save();
-
-      delete otpStore[email];
-
-      res.status(200).json({ message: 'Password reset successfully' });
-    } catch (err) {
-      res.status(500).json({ message: err.message });
-    }
-  }
+  return res
+    .cookie("token", "", {
+      httpOnly: true,
+      expires: new Date(0), // Expire immediately
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+    })
+    .status(200)
+    .json({ message: "Logout successful" });
+}
 };
 
 module.exports = userController;

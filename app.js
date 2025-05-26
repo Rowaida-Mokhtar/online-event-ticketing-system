@@ -1,8 +1,10 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const path = require('path');
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 require("dotenv").config();
+
 
 const app = express();
 
@@ -19,21 +21,28 @@ const { notFound, errorHandler } = require("./Backend/Middleware/errorMiddleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+// app.js
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 
 // CORS Config
 app.use(
   cors({
-    origin: process.env.ORIGIN || "http://localhost:3000",
+    origin: process.env.ORIGIN,
     methods: ["GET", "POST", "DELETE", "PUT"],
     credentials: true,
   })
 );
 
 // Routes
-app.use('/api/v1', authRouter);                // Handles: /register, /login, /forgetPassword
-app.use('/api/v1/users', userRouter);          // Handles: /users, /users/:id, /users/profile, etc.
-app.use('/api/v1/bookings', bookingRouter);    // Handles: /bookings, /bookings/:id
-app.use('/api/v1/events', eventRouter);        // Handles: /events, /events/:id
+app.use('/api/v1', authRouter);               
+app.use('/api/v1/users', userRouter);        
+app.use('/api/v1/bookings', bookingRouter);    
+app.use('/api/v1/events', eventRouter);       
+
+app.get('/', (req, res) => {
+  res.send('API is running');
+});
 
 
 // Not Found Handler
@@ -43,8 +52,7 @@ app.use(notFound);
 app.use(errorHandler);
 
 // MongoDB Connection
-//const db_name = process.env.DB_NAME || "event_ticketing";
-const db_url = process.env.MONGO_URI; // fallback to local or cloud
+const db_url = process.env.MONGO_URI; 
 
 mongoose
   .connect(db_url)
@@ -52,7 +60,7 @@ mongoose
   .catch((err) => console.error(" MongoDB connection error:", err));
 
 // Start Server
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });

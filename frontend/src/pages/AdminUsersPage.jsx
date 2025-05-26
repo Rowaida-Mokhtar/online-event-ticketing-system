@@ -117,59 +117,60 @@ const AdminUsersPage = () => {
         </table>
       )}
 
-      {/* Confirmation Modal */}
-      {confirmModal.show && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.5)',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          zIndex: 9999
-        }}>
-          <div style={{
-            background: 'white',
-            padding: '20px',
-            borderRadius: '8px',
-            width: '300px',
-            textAlign: 'center'
-          }}>
-            <h3>Confirm Delete</h3>
-            <p>Are you sure you want to delete this user?</p>
-            <div>
-              <button
-                onClick={confirmDeleteUser}
-                style={{
-                  background: '#ffc0cb',
-                  color: 'black',
-                  border: 'none',
-                  padding: '6px 12px',
-                  marginRight: '10px',
-                  borderRadius: '4px'
-                }}
-              >
-                Yes
-              </button>
-              <button
-                onClick={() => setConfirmModal({ show: false, userId: null })}
-                style={{
-                  background: '#ffc0cb',
-                  color: 'black',
-                  border: 'none',
-                  padding: '6px 12px',
-                  borderRadius: '4px'
-                }}
-              >
-                No
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+     {confirmModal.show && (
+  <div style={{
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 9999
+  }}>
+    <div style={{
+      background: 'white',
+      padding: '20px',
+      borderRadius: '8px',
+      width: '300px',
+      textAlign: 'center'
+    }}>
+      <h3 style={{ color: 'black' }}>Confirm Delete</h3>
+      <p style={{ color: 'black' }}>Are you sure you want to delete this user?</p>
+      <div>
+        <button
+          onClick={confirmDeleteUser}
+          style={{
+            background: '#ffc0cb',
+            color: 'black',
+            border: 'none',
+            padding: '6px 12px',
+            marginRight: '10px',
+            borderRadius: '4px'
+          }}
+        >
+          Yes
+        </button>
+        <button
+          onClick={() => setConfirmModal({ show: false, userId: null })}
+          style={{
+            background: '#ffc0cb',
+            color: 'black',
+            border: 'none',
+            padding: '6px 12px',
+            borderRadius: '4px'
+          }}
+        >
+          No
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+   
     </div>
   );
 };

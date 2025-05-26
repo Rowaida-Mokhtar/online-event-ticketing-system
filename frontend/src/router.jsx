@@ -19,6 +19,7 @@ import LandingPage from './pages/LandingPage';
 import ProtectedRoute from './components/shared/ProtectedRoute';
 import BookingDetails from './components/bookings/BookingDetails';
 import EventDetails from './components/events/EventDetails';
+import EventList from './components/events/EventList';
 
 const AppRouter = () => {
   const { user, loading } = useContext(AuthContext);
@@ -36,6 +37,8 @@ const AppRouter = () => {
       <Route path="/register" element={!user ? <RegisterPage /> : <Navigate to="/" replace />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+      <Route path="/events" element={<EventList />} />
+
 
       {/* Public Event Detail */}
       <Route path="/events/:id" element={<EventDetailsPage />} />

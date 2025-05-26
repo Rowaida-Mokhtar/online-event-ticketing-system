@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import axios from '../../services/axios';
 import { AuthContext } from '../../context/AuthContext';
+import '../../styles/updateprofile.css'
 
 const UpdateProfileForm = () => {
   const { user } = useContext(AuthContext);
@@ -38,7 +39,6 @@ const UpdateProfileForm = () => {
   return (
     <div className="auth-container">
       <form onSubmit={handleSubmit} className="auth-form">
-        <h2 className="auth-title">My Profile</h2>
         <label>
           Name
           <input

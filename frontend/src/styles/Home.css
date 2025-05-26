@@ -27,7 +27,7 @@ body, html {
   margin-bottom: 20px;
   padding: 10px;
   background-color: #1a1a1a; /* Dark background for top bar */
-  box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 4px rgba(40, 38, 38, 0.1);
 }
 
 .icon {
@@ -81,7 +81,7 @@ body, html {
   width: 250px;
   height: 100%;
   background-color: #1a1a1a; /* Dark background for sidebar */
-  box-shadow: 2px 0 4px rgba(255, 255, 255, 0.1);
+  box-shadow: 2px 0 4px rgba(97, 13, 4, 0.1);
   z-index: 1000;
   overflow-y: auto;
 }
